@@ -48,12 +48,23 @@ passport.use(
 						.save()
 						.then(user => done(null, user));
 
-					new Profile({
-						name: profile.displayName,
-						email: profile.emails[0].value
-					})
-						.save()
-						.then(profile => done(null, profile))
+					Profile.findOne({ email: profile.emails[0].value })
+						.then((existingEmail) => {
+							if(existingEmail){
+								console.log("email exists!");
+								done(null, existingEmail)
+							}
+
+							else{
+								new Profile({
+									name: profile.displayName,
+									email: profile.emails[0].value
+								})
+									.save()
+									.then(profile => done(null, profile))
+							}
+						})
+					
 				}
 			});
 	})
@@ -76,17 +87,26 @@ passport.use(
 					done(null, existingUser);
 				}
 				else {
-					//saving User is async
 					new User({ facebookId: profile.id })
 						.save()
 						.then(user => done(null, user));
 
-					new Profile({
-						name: profile.displayName,
-						email: profile.emails[0].value
-					})
-						.save()
-						.then(profile => done(null, profile))
+					Profile.findOne({ email: profile.emails[0].value })
+						.then((existingEmail) => {
+							if(existingEmail){
+								console.log("email exists!");
+								done(null, existingEmail)
+							}
+
+							else{
+								new Profile({
+									name: profile.displayName,
+									email: profile.emails[0].value
+								})
+									.save()
+									.then(profile => done(null, profile))
+							}
+						})
 				}
 			});
     }
@@ -107,17 +127,26 @@ passport.use(
 					done(null, existingUser);
 				}
 				else {
-					//saving User is async
 					new User({ twitterId: profile.id })
 						.save()
 						.then(user => done(null, user));
 
-					new Profile({
-						name: profile.displayName,
-						email: profile.emails[0].value
-					})
-						.save()
-						.then(profile => done(null, profile))
+					Profile.findOne({ email: profile.emails[0].value })
+						.then((existingEmail) => {
+							if(existingEmail){
+								console.log("email exists!");
+								done(null, existingEmail)
+							}
+
+							else{
+								new Profile({
+									name: profile.displayName,
+									email: profile.emails[0].value
+								})
+									.save()
+									.then(profile => done(null, profile))
+							}
+						})
 				}
 			});
     }

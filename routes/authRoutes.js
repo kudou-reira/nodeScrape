@@ -10,7 +10,13 @@ module.exports = (app) => {
 
 	//both use passport.authenticate('google'), but the one below does other stuff
 
-	app.get('/auth/google/callback', passport.authenticate('google'))
+	app.get(
+		'/auth/google/callback', 
+		passport.authenticate('google'),
+		(req, res) => {
+			res.redirect('/saved-locations')
+		}
+	)
 
 	app.get('/auth/facebook', 
 		passport.authenticate('facebook', {
@@ -18,7 +24,13 @@ module.exports = (app) => {
 		})
 	);
 
-	app.get('/auth/facebook/callback', passport.authenticate('facebook'))
+	app.get(
+		'/auth/facebook/callback', 
+		passport.authenticate('facebook'),
+		(req, res) => {
+			res.redirect('/saved-locations')
+		}
+	)
 
 	app.get('/auth/twitter', 
 		passport.authenticate('twitter', {
@@ -26,8 +38,14 @@ module.exports = (app) => {
 		})
 	);
 
-	app.get('/auth/twitter/callback', passport.authenticate('twitter'))
-
+	app.get(
+		'/auth/twitter/callback', 
+		passport.authenticate('twitter'),
+		(req, res) => {
+			res.redirect('/saved-locations')
+		}
+	)
+ 
 	app.post('/login', passport.authenticate('local', {
 	  failureRedirect: '/login'
 	}), (req, res) => {
@@ -39,7 +57,7 @@ module.exports = (app) => {
 
 	app.get('/api/logout', (req, res) => {
 		req.logout();
-		res.send(req.user);
+		res.redirect('/');
 	});
 
 	app.get('/api/current_user', (req, res) => {
