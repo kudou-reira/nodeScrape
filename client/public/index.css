@@ -11,6 +11,12 @@ body,html{
 	width:80%;
 }
 
+h3{
+    margin-top: 2%;
+    margin-bottom: 2%;
+    text-align:left;
+}
+
 .navbar .nav > li > a {
     float: none;
     line-height: 19px;
@@ -31,9 +37,13 @@ body,html{
     margin-top: 2%;
 }
 
+.spaceBottom{
+    margin-bottom: 2%;
+}
+
 .formatInner{
     margin-bottom: 4%;
-    width: 50%;
+    width: 75%;
     margin: auto;
 }
 

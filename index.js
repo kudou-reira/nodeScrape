@@ -38,12 +38,14 @@ app.use(passport.session());
 require('./routes/authRoutes')(app);
 require('./routes/searchRoutes')(app);
 
-request('http://www.google.com/', (err, res, html) => {
-	if(!err){
-		$ = cheerio.load(html);
-		console.log(res.body);
-	}
-})
+// request('http://www.google.com/', (err, res, html) => {
+// 	if(!err){
+// 		$ = cheerio.load(html);
+// 		console.log(res.body);
+// 	}
+// })
+
+
 
 
 const PORT = process.env.PORT || 5000;
