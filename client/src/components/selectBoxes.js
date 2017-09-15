@@ -3,16 +3,20 @@ import { Button, ToggleButtonGroup, ButtonToolbar, ToggleButton } from 'react-bo
 import _ from 'lodash';
 import tokyoValues from '../lib/tokyo/tokyoValues';
 
+
+
 class SelectBoxes extends Component {
 
 	constructor(){
 		super();
 
 		this.state = {
-			placesToSearch: '',
-			tokyoPresets: tokyoValues
+			placesToSearch: [],
+			tokyoPresets: tokyoValues,
+			tempHold: ''
 		}
 	}
+
 
 	renderTokyo() {
 		var tempTokyo = this.alphabetize(this.state.tokyoPresets);
@@ -34,8 +38,31 @@ class SelectBoxes extends Component {
 	handleClick(e) {
 		//checks if clicked or not, could be useful
 		//let isChecked = e.target.checked;
-		let checkedValue = e.target.value;
+		var checkedValue = e.target.value;
 		console.log(checkedValue);
+	
+		var array = this.state.placesToSearch.slice();
+
+		if(!array.includes(checkedValue)){
+			array.push(checkedValue);
+			this.setState({ placesToSearch: array }, () => {
+				//callback
+				console.log("places to search", this.state.placesToSearch);
+			});
+		}
+
+		else{
+			_.remove(array, (val) => {
+				return val === checkedValue;
+			});
+
+			this.setState({ placesToSearch: array }, () => {
+				//callback
+				console.log("places to search", this.state.placesToSearch);
+			});
+		}
+		
+
 	}
 
 

@@ -153,18 +153,18 @@ passport.use(
 ));
 
 
-passport.use(
-	new LocalStrategy(
-		async (username, password, done) => {
-			let user = await User.findOne({ username });
-			if (!user) {
-				return done(null, false);
-			}
-			// TODO Change to test against bcrypt password
-			if (user.password != password) {
-				return done(null, false);
-			}
-			return done(null, user);
-    	}
-    )
-);
+// passport.use(
+// 	new LocalStrategy(
+// 		async (username, password, done) => {
+// 			let user = await User.findOne({ username });
+// 			if (!user) {
+// 				return done(null, false);
+// 			}
+// 			// TODO Change to test against bcrypt password
+// 			if (user.password != password) {
+// 				return done(null, false);
+// 			}
+// 			return done(null, user);
+//     	}
+//     )
+// );
