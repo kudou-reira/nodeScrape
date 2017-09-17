@@ -38,12 +38,21 @@ app.use(passport.session());
 require('./routes/authRoutes')(app);
 require('./routes/searchRoutes')(app);
 
-// request('http://www.google.com/', (err, res, html) => {
-// 	if(!err){
-// 		$ = cheerio.load(html);
-// 		console.log(res.body);
-// 	}
-// })
+var apaman = 'http://www.apamanshop.com/tokyo/';
+
+var apamanTest = 'http://www.apamanshop.com/tokyo/104/?madori=10-11-12-14-21-22&tinryo1=20000&tinryo2=100000&senyu1=15&senyu2=30&nensu=1&toho=7&chintai_plan=chintai';
+
+request(apamanTest, (err, res, html) => {
+	if(!err){
+		$ = cheerio.load(html);
+
+
+		var overall = $('.mod_box_section_bdt').text();
+		// console.log(res.body);
+
+		console.log(overall);
+	}
+})
 
 
 

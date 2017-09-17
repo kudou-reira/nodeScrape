@@ -11,8 +11,24 @@ module.exports = (app) => {
 		let highPrice = req.query.highPrice;
 		let lowerRoom = req.query.lowerRoom;
 		let higherRoom = req.query.higherRoom;
+		let deposit = req.query.deposit;
+		let key = req.query.key;
 
-		console.log(ward, roomType, lowPrice, highPrice, lowerRoom, higherRoom);
+		console.log(ward, roomType, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key);
+
+
+		var apaman = 'http://www.apamanshop.com/tokyo/';
+
+		var apamanTest = 'http://www.apamanshop.com/tokyo/104/?madori=10-11-12-14-21-22&tinryo1=20000&tinryo2=100000&senyu1=15&senyu2=30&nensu=1&toho=7&chintai_plan=chintai';
+
+
+		request(apamanTest, (err, res, html) => {
+			if(!err){
+					$ = cheerio.load(html);
+					console.log(res.body);
+			}
+		})
+
 		res.send(ward);
 	});
 

@@ -17,8 +17,10 @@ class SelectBoxes extends Component {
 
 		this.state = {
 			placesToSearch: [],
+			placesToSearchError: false,
 			tokyoPresets: tokyoValues,
 			sizeToSearch: [],
+			sizeToSearchError: false,
 			roomPresets: roomSize,
 			lowPriceToSearch: 0,
 			lowPricePresets: generateLowerLimits(),
@@ -28,6 +30,8 @@ class SelectBoxes extends Component {
 			lowRoomPresets: generateLowerRoomLimits(),
 			highRoomToSearch: 0,
 			highRoomPresets: generateHigherRoomLimits(),
+			depositMoney: false,
+			keyMoney: false,
 			priceError: false,
 			areaError: false
 		}
@@ -62,7 +66,7 @@ class SelectBoxes extends Component {
 		var tempPrice = this.state.lowPricePresets;
 		tempPrice = tempPrice.map((value) => {
 			return(
-				<ToggleButton onChange={e => this.handleLowPriceClick(e)} value={value.price} key={value.price}>
+				<ToggleButton onChange={e => this.handleExtraParamsClick(e)} value={value.price} key={value.price}>
 		    		{value.label} 万
 		        </ToggleButton>
 			);
@@ -74,7 +78,7 @@ class SelectBoxes extends Component {
 		var tempPrice = this.state.highPricePresets;
 		tempPrice = tempPrice.map((value) => {
 			return(
-				<ToggleButton onChange={e => this.handleHighPriceClick(e)} value={value.price} key={value.price}>
+				<ToggleButton onChange={e => this.handleExtraParamsClick(e)} value={value.price} key={value.price}>
 		    		{value.label} 万
 		        </ToggleButton>
 			);
@@ -86,7 +90,7 @@ class SelectBoxes extends Component {
 		var tempSize = this.state.lowRoomPresets;
 		tempSize = tempSize.map((value) => {
 			return(
-				<ToggleButton onChange={e => this.handleLowRoomClick(e)} value={value.size} key={value.size}>
+				<ToggleButton onChange={e => this.handleExtraParamsClick(e)} value={value.size} key={value.size}>
 		    		{value.label} m&sup2;
 		        </ToggleButton>
 			);
@@ -98,12 +102,40 @@ class SelectBoxes extends Component {
 		var tempSize = this.state.highRoomPresets;
 		tempSize = tempSize.map((value) => {
 			return(
-				<ToggleButton onChange={e => this.handleHighRoomClick(e)} value={value.size} key={value.size}>
+				<ToggleButton onChange={e => this.handleExtraParamsClick(e)} value={value.size} key={value.size}>
 		    		{value.label} m&sup2;
 		        </ToggleButton>
 			);
 		});
 		return tempSize;
+	}
+
+	renderDeposit() {
+		var depositTemp = (
+			<ToggleButtonGroup type="radio" name="depositMoney">
+				<ToggleButton onChange={e => this.handleExtraParamsClick(e)} value={true} key={1}>
+		    		Yes
+		        </ToggleButton>
+		        <ToggleButton onChange={e => this.handleExtraParamsClick(e)} value={false} key={2}>
+		    		No
+		        </ToggleButton>
+	        </ToggleButtonGroup>
+	    );
+	    return depositTemp;
+	}
+
+	renderKey() {
+		var keyTemp = (
+			<ToggleButtonGroup type="radio" name="keyMoney">
+				<ToggleButton onChange={e => this.handleExtraParamsClick(e)} value={true} key={1}>
+		    		Yes
+		        </ToggleButton>
+		        <ToggleButton onChange={e => this.handleExtraParamsClick(e)} value={false} key={2}>
+		    		No
+		        </ToggleButton>
+	        </ToggleButtonGroup>
+	    );
+	    return keyTemp;
 	}
 
 	alphabetize(val) {
@@ -115,13 +147,13 @@ class SelectBoxes extends Component {
 		//checks if clicked or not, could be useful
 		//let isChecked = e.target.checked;
 		var checkedValue = e.target.value;
-		console.log(checkedValue);
+
 	
 		var array = this.state.placesToSearch.slice();
 
 		if(!array.includes(checkedValue)){
 			array.push(checkedValue);
-			this.setState({ placesToSearch: array });
+			this.setState({ placesToSearch: array }, () => console.log(this.state.placesToSearch));
 		}
 
 		else{
@@ -129,7 +161,7 @@ class SelectBoxes extends Component {
 				return val === checkedValue;
 			});
 
-			this.setState({ placesToSearch: array });
+			this.setState({ placesToSearch: array }, () => console.log(this.state.placesToSearch));
 		}
 	}
 
@@ -157,45 +189,17 @@ class SelectBoxes extends Component {
 		console.log('size to search', this.state.sizeToSearch);
 	}
 
-	handleLowPriceClick(e) {
+	handleExtraParamsClick(e) {
 		//checks if clicked or not, could be useful
 		//let isChecked = e.target.checked;
-		var checkedValue = e.target.value;
-		this.setState({ lowPriceToSearch: checkedValue }, () => {
+		this.setState({ [e.target.name]: e.target.value }, () => {
 			console.log(this.state.lowPriceToSearch);
 		});
 	}
 
-	handleHighPriceClick(e) {
-		//checks if clicked or not, could be useful
-		//let isChecked = e.target.checked;
-		var checkedValue = e.target.value;
-		this.setState({ highPriceToSearch: checkedValue }, () => {
-			console.log(this.state.highPriceToSearch);
-		});
-	}
-
-	handleLowRoomClick(e) {
-		//checks if clicked or not, could be useful
-		//let isChecked = e.target.checked;
-		var checkedValue = e.target.value;
-		this.setState({ lowRoomToSearch: checkedValue }, () => {
-			console.log(this.state.lowRoomToSearch);
-		});
-	}
-
-
-	handleHighRoomClick(e) {
-		//checks if clicked or not, could be useful
-		//let isChecked = e.target.checked;
-		var checkedValue = e.target.value;
-		this.setState({ highRoomToSearch: checkedValue }, () => {
-			console.log(this.state.highRoomToSearch);
-		});
-	}
 
 	renderErrors(){
-		if(this.state.priceError === true){
+		if(this.state.lowPriceToSearch/10 >= this.state.highPriceToSearch/10 && this.state.lowPriceToSearch !== 0){
 			console.log("the lower price is " + this.state.lowPriceToSearch + "this higher price is " + this.state.highPriceToSearch);
 			console.log(this.state.lowPriceToSearch > this.state.highPriceToSearch)
 			return(
@@ -203,33 +207,39 @@ class SelectBoxes extends Component {
 			)
 		}
 
-		else if(this.state.areaError === true){
+		else if(this.state.lowRoomToSearch >= this.state.highRoomToSearch && this.state.lowRoomToSearch !== 0){
 			return(
 				<h2>Lower room area is higher than or equal to higher room area!</h2>
+			)
+		}
+
+		else if(this.state.placesToSearch.length < 1){
+			console.log("this is the length of placesToSearch", this.state.placesToSearch.length);
+			console.log("places to search error", this.state.placesToSearchError)
+			return(
+				<h2>Please select at least one ward</h2>
+			)
+		}
+
+		else if(this.state.sizeToSearch < 1){
+			return(
+				<h2>Please select at least one room type</h2>
 			)
 		}
 
 	}
 
 	submitInfo(e) {
-		// console.log("placesToSearch", this.state.placesToSearch);
-		// console.log("room size", this.state.sizeToSearch);
-		// console.log("low price", this.state.lowPriceToSearch);
-		// console.log("high price", this.state.highPriceToSearch);
-		// console.log("lower room area", this.state.lowRoomToSearch);
-		// console.log("lower room area", this.state.highRoomToSearch);
 
-		// when empty
-		// placesToSearch []
-		// selectBoxes.js:192 room size []
-		// selectBoxes.js:193 low price 0
-		// selectBoxes.js:194 high price 0
-		// selectBoxes.js:195 lower room area 0
-		// selectBoxes.js:196 lower room area 0
-		console.log(this.state.priceError);
+		if(this.state.placesToSearch.length < 1){
+			this.setState({ placesToSearchError: true });
+		}
 
-		if(this.state.lowPriceToSearch/10 >= this.state.highPriceToSearch/10 && this.state.lowPriceToSearch !== 0){
-			// console.log(this.state.lowPriceToSearch + '>' + this.state.highPriceToSearch)
+		else if(this.state.sizeToSearch.length < 1){
+			this.setState({ sizeToSearchError: true });
+		}
+
+		else if(this.state.lowPriceToSearch/10 >= this.state.highPriceToSearch/10 && this.state.lowPriceToSearch !== 0){
 			this.setState({ priceError: true });
 
 		}
@@ -238,6 +248,8 @@ class SelectBoxes extends Component {
 			this.setState({ areaError: true});
 		}
 
+
+
 		else{
 			this.props.searchParamsWard(
 				this.state.placesToSearch, 
@@ -245,10 +257,12 @@ class SelectBoxes extends Component {
 				this.state.lowPriceToSearch,
 				this.state.highPriceToSearch,
 				this.state.lowRoomToSearch,
-				this.state.highRoomToSearch
+				this.state.highRoomToSearch,
+				this.state.depositMoney,
+				this.state.keyMoney
 			);
 
-			this.setState({ priceError: false, areaError: false });
+			this.setState({ priceError: false, areaError: false, placesToSearchError: false, sizeToSearchError: false });
 		}
 		
 	}
@@ -282,7 +296,7 @@ class SelectBoxes extends Component {
 					<div className="formatInner">
 						<h3>Lower Price Range</h3>
 						<ButtonToolbar>
-							<ToggleButtonGroup type="radio" name="lowPrices">
+							<ToggleButtonGroup type="radio" name="lowPriceToSearch">
 								{this.renderLowerPrice()}
 							</ToggleButtonGroup>
 						</ButtonToolbar>
@@ -292,7 +306,7 @@ class SelectBoxes extends Component {
 					<div className="formatInner">
 						<h3>Higher Price Range</h3>
 						<ButtonToolbar>
-							<ToggleButtonGroup type="radio" name="highPrices">
+							<ToggleButtonGroup type="radio" name="highPriceToSearch">
 								{this.renderHigherPrice()}
 							</ToggleButtonGroup>
 						</ButtonToolbar>
@@ -302,7 +316,7 @@ class SelectBoxes extends Component {
 					<div className="formatInner">
 						<h3>Lower Room Area Range</h3>
 						<ButtonToolbar>
-							<ToggleButtonGroup type="radio" name="lowerRoom">
+							<ToggleButtonGroup type="radio" name="lowRoomToSearch">
 								{this.renderLowerRoomSize()}
 							</ToggleButtonGroup>
 						</ButtonToolbar>
@@ -312,9 +326,25 @@ class SelectBoxes extends Component {
 					<div className="formatInner">
 						<h3>Higher Room Area Range</h3>
 						<ButtonToolbar>
-							<ToggleButtonGroup type="radio" name="higherRoom">
+							<ToggleButtonGroup type="radio" name="highRoomToSearch">
 								{this.renderHigherRoomSize()}
 							</ToggleButtonGroup>
+						</ButtonToolbar>
+					</div>
+			    </div>
+			    <div className="spaceTop">
+					<div className="formatInner">
+						<h3>Deposit Required?</h3>
+						<ButtonToolbar>
+							{this.renderDeposit()}
+						</ButtonToolbar>
+					</div>
+			    </div>
+			    <div className="spaceTop">
+					<div className="formatInner">
+						<h3>Key Money Required?</h3>
+						<ButtonToolbar>
+							{this.renderKey()}
 						</ButtonToolbar>
 					</div>
 			    </div>
