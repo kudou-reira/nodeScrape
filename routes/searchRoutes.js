@@ -4,8 +4,16 @@ const request = require('request');
 
 module.exports = (app) => {
 
-	app.get('/api/search', (req, res) => {
+	app.get('/api/searchByWard', (req, res) => {
+		let ward = req.query.ward;
+		let roomType = req.query.roomType;
+		let lowPrice = req.query.lowPrice;
+		let highPrice = req.query.highPrice;
+		let lowerRoom = req.query.lowerRoom;
+		let higherRoom = req.query.higherRoom;
 
+		console.log(ward, roomType, lowPrice, highPrice, lowerRoom, higherRoom);
+		res.send(ward);
 	});
 
 	app.get('/api/save', requireLogin, async (req, res) => {

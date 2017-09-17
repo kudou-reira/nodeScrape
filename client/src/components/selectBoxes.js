@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
 import { Button, ToggleButtonGroup, ButtonToolbar, ToggleButton } from 'react-bootstrap';
 import _ from 'lodash';
+import { connect } from 'react-redux';
+import * as actions from '../actions';
+
 import tokyoValues from '../lib/tokyo/tokyoValues';
 import roomSize from '../lib/roomParams/roomSize';
 import { generateLowerLimits, generateHigherLimits } from '../lib/roomParams/limitPrices';
@@ -24,7 +27,9 @@ class SelectBoxes extends Component {
 			lowRoomToSearch: 0,
 			lowRoomPresets: generateLowerRoomLimits(),
 			highRoomToSearch: 0,
-			highRoomPresets: generateHigherRoomLimits()
+			highRoomPresets: generateHigherRoomLimits(),
+			priceError: false,
+			areaError: false
 		}
 	}
 
@@ -82,7 +87,7 @@ class SelectBoxes extends Component {
 		tempSize = tempSize.map((value) => {
 			return(
 				<ToggleButton onChange={e => this.handleLowRoomClick(e)} value={value.size} key={value.size}>
-		    		{value.label} m2
+		    		{value.label} m&sup2;
 		        </ToggleButton>
 			);
 		});
@@ -93,8 +98,8 @@ class SelectBoxes extends Component {
 		var tempSize = this.state.highRoomPresets;
 		tempSize = tempSize.map((value) => {
 			return(
-				<ToggleButton onChange={e => this.handleHighPriceClick(e)} value={value.size} key={value.size}>
-		    		{value.label} m2
+				<ToggleButton onChange={e => this.handleHighRoomClick(e)} value={value.size} key={value.size}>
+		    		{value.label} m&sup2;
 		        </ToggleButton>
 			);
 		});
@@ -148,6 +153,8 @@ class SelectBoxes extends Component {
 
 			this.setState({ sizeToSearch: array });
 		}
+
+		console.log('size to search', this.state.sizeToSearch);
 	}
 
 	handleLowPriceClick(e) {
@@ -187,13 +194,64 @@ class SelectBoxes extends Component {
 		});
 	}
 
-	submitInfo() {
-		console.log("placesToSearch", this.state.placesToSearch);
-		console.log("room size", this.state.sizeToSearch);
-		console.log("low price", this.state.lowPriceToSearch);
-		console.log("high price", this.state.highPriceToSearch);
+	renderErrors(){
+		if(this.state.priceError === true){
+			console.log("the lower price is " + this.state.lowPriceToSearch + "this higher price is " + this.state.highPriceToSearch);
+			console.log(this.state.lowPriceToSearch > this.state.highPriceToSearch)
+			return(
+				<h2>Lower range price is higher than or equal higher range price!</h2>
+			)
+		}
+
+		else if(this.state.areaError === true){
+			return(
+				<h2>Lower room area is higher than or equal to higher room area!</h2>
+			)
+		}
+
 	}
 
+	submitInfo(e) {
+		// console.log("placesToSearch", this.state.placesToSearch);
+		// console.log("room size", this.state.sizeToSearch);
+		// console.log("low price", this.state.lowPriceToSearch);
+		// console.log("high price", this.state.highPriceToSearch);
+		// console.log("lower room area", this.state.lowRoomToSearch);
+		// console.log("lower room area", this.state.highRoomToSearch);
+
+		// when empty
+		// placesToSearch []
+		// selectBoxes.js:192 room size []
+		// selectBoxes.js:193 low price 0
+		// selectBoxes.js:194 high price 0
+		// selectBoxes.js:195 lower room area 0
+		// selectBoxes.js:196 lower room area 0
+		console.log(this.state.priceError);
+
+		if(this.state.lowPriceToSearch/10 >= this.state.highPriceToSearch/10 && this.state.lowPriceToSearch !== 0){
+			// console.log(this.state.lowPriceToSearch + '>' + this.state.highPriceToSearch)
+			this.setState({ priceError: true });
+
+		}
+
+		else if(this.state.lowRoomToSearch >= this.state.highRoomToSearch && this.state.lowRoomToSearch !== 0){
+			this.setState({ areaError: true});
+		}
+
+		else{
+			this.props.searchParamsWard(
+				this.state.placesToSearch, 
+				this.state.sizeToSearch, 
+				this.state.lowPriceToSearch,
+				this.state.highPriceToSearch,
+				this.state.lowRoomToSearch,
+				this.state.highRoomToSearch
+			);
+
+			this.setState({ priceError: false, areaError: false });
+		}
+		
+	}
 
 	render(){
 		return(
@@ -260,6 +318,9 @@ class SelectBoxes extends Component {
 						</ButtonToolbar>
 					</div>
 			    </div>
+			    <div className="spaceTop">
+			    	{this.renderErrors()}
+			    </div>
 			    <div className="spaceBottom">
 				    <Button className="spaceTop" type="submit" onClick={this.submitInfo.bind(this)}>
 						Submit
@@ -270,4 +331,4 @@ class SelectBoxes extends Component {
 	}
 }
 
-export default SelectBoxes;
+export default connect(null, actions)(SelectBoxes);
