@@ -52,8 +52,11 @@ request(apamanTest, (err, res, html) => {
 		overallBox.each(function() {
 			array.push({
 				buildingName: $(this).find($('.name')).text(),
-				link: $(this).find($('.box_head_result')).find($('a')).attr('href'),
-				priceRange: $(this).find($('.info')).find($('.price')).text()
+				link: 'http://www.apamanshop.com/' + $(this).find($('.box_head_result')).find($('a')).attr('href'),
+				location: $(this).find($('.address')).text(),
+				trainStation: $(this).find($('.list_info')).find($('li')).text(),
+				priceRange: $(this).find($('.info')).find($('.price')).text(),
+				propertiesAvailable: $(this).find($('tbody')).find($('tr')).length-$(this).find($('tbody')).find($('.tr_under')).length-1
 			});
 		});
 
