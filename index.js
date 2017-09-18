@@ -45,12 +45,19 @@ var apamanTest = 'http://www.apamanshop.com/tokyo/104/?madori=10-11-12-14-21-22&
 request(apamanTest, (err, res, html) => {
 	if(!err){
 		$ = cheerio.load(html);
+		var array = [];
 
-
-		var overall = $('.mod_box_section_bdt').text();
+		var overallBox = $('.mod_box_section_bdt');
 		// console.log(res.body);
+		overallBox.each(function() {
+			array.push({
+				buildingName: $(this).find($('.name')).text(),
+				link: $(this).find($('.box_head_result')).find($('a')).attr('href'),
+				priceRange: $(this).find($('.info')).find($('.price')).text()
+			});
+		});
 
-		console.log(overall);
+		console.log(array);
 	}
 })
 
