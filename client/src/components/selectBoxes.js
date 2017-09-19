@@ -6,6 +6,8 @@ import * as actions from '../actions';
 
 import tokyoValues from '../lib/tokyo/tokyoValues';
 import roomSize from '../lib/roomParams/roomSize';
+import buildingAge from '../lib/roomParams/buildingAge';
+import walkingDistance from '../lib/roomParams/walkingDistance';
 import { generateLowerLimits, generateHigherLimits } from '../lib/roomParams/limitPrices';
 import { generateLowerRoomLimits, generateHigherRoomLimits } from '../lib/roomParams/limitSize';
 
@@ -24,12 +26,16 @@ class SelectBoxes extends Component {
 			roomPresets: roomSize,
 			lowPriceToSearch: 0,
 			lowPricePresets: generateLowerLimits(),
-			highPriceToSearch: 0,
+			highPriceToSearch: 9999999,
 			highPricePresets: generateHigherLimits(),
 			lowRoomToSearch: 0,
 			lowRoomPresets: generateLowerRoomLimits(),
-			highRoomToSearch: 0,
+			highRoomToSearch: 99999,
 			highRoomPresets: generateHigherRoomLimits(),
+			buildingAge: 0,
+			buildingAgePresets: buildingAge,
+			walkingDistance: 0,
+			walkingDistancePresets: walkingDistance,
 			depositMoney: false,
 			keyMoney: false,
 			priceError: false,
@@ -108,6 +114,30 @@ class SelectBoxes extends Component {
 			);
 		});
 		return tempSize;
+	}
+
+	renderBuildingAge() {
+		var tempBuildingAge = this.state.buildingAgePresets;
+		tempBuildingAge = tempBuildingAge.map((value) => {
+			return(
+				<ToggleButton onChange={e => this.handleExtraParamsClick(e)} value={value.value} key={value.value}>
+		    		{value.year}
+		        </ToggleButton>
+			);
+		});
+		return tempBuildingAge;
+	}
+
+	renderWalkingDistance() {
+		var tempWalkingDistance = this.state.walkingDistancePresets;
+		tempWalkingDistance = tempWalkingDistance.map((value) => {
+			return(
+				<ToggleButton onChange={e => this.handleExtraParamsClick(e)} value={value.minutes} key={value.minutes}>
+		    		{value.distance}
+		        </ToggleButton>
+			);
+		});
+		return tempWalkingDistance;
 	}
 
 	renderDeposit() {
@@ -259,7 +289,9 @@ class SelectBoxes extends Component {
 				this.state.lowRoomToSearch,
 				this.state.highRoomToSearch,
 				this.state.depositMoney,
-				this.state.keyMoney
+				this.state.keyMoney,
+				this.state.buildingAge,
+				this.state.walkingDistance
 			);
 
 			this.setState({ priceError: false, areaError: false, placesToSearchError: false, sizeToSearchError: false });
@@ -294,7 +326,7 @@ class SelectBoxes extends Component {
 			    </div>
 			    <div className="spaceTop">
 					<div className="formatInner">
-						<h3>Lower Price Range</h3>
+						<h3>Minimum Price</h3>
 						<ButtonToolbar>
 							<ToggleButtonGroup type="radio" name="lowPriceToSearch">
 								{this.renderLowerPrice()}
@@ -304,7 +336,7 @@ class SelectBoxes extends Component {
 			    </div>
 			    <div className="spaceTop">
 					<div className="formatInner">
-						<h3>Higher Price Range</h3>
+						<h3>Maximum Price</h3>
 						<ButtonToolbar>
 							<ToggleButtonGroup type="radio" name="highPriceToSearch">
 								{this.renderHigherPrice()}
@@ -314,7 +346,7 @@ class SelectBoxes extends Component {
 			    </div>
 			    <div className="spaceTop">
 					<div className="formatInner">
-						<h3>Lower Room Area Range</h3>
+						<h3>Minimum Room Area</h3>
 						<ButtonToolbar>
 							<ToggleButtonGroup type="radio" name="lowRoomToSearch">
 								{this.renderLowerRoomSize()}
@@ -324,10 +356,30 @@ class SelectBoxes extends Component {
 			    </div>
 			    <div className="spaceTop">
 					<div className="formatInner">
-						<h3>Higher Room Area Range</h3>
+						<h3>Maximum Room Area</h3>
 						<ButtonToolbar>
 							<ToggleButtonGroup type="radio" name="highRoomToSearch">
 								{this.renderHigherRoomSize()}
+							</ToggleButtonGroup>
+						</ButtonToolbar>
+					</div>
+			    </div>
+			    <div className="spaceTop">
+					<div className="formatInner">
+						<h3>Building Age</h3>
+						<ButtonToolbar>
+							<ToggleButtonGroup type="radio" name="buildingAge">
+								{this.renderBuildingAge()}
+							</ToggleButtonGroup>
+						</ButtonToolbar>
+					</div>
+			    </div>
+			    <div className="spaceTop">
+					<div className="formatInner">
+						<h3>Walking Distance</h3>
+						<ButtonToolbar>
+							<ToggleButtonGroup type="radio" name="walkingDistance">
+								{this.renderWalkingDistance()}
 							</ToggleButtonGroup>
 						</ButtonToolbar>
 					</div>
