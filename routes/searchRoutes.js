@@ -33,66 +33,109 @@ module.exports = (app) => {
 
 		console.log("this is apamanString", apamanString);
 
-		request(apamanString, (err, res, html) => {
-			if(!err){
-				$ = cheerio.load(html);
-
-				var numberOfPages = ($('.mod_pager'));
-				var number;
-
-				numberOfPages.each(function() {
-					number = $(this).find('.next').prev().text();
-				});
-
-				console.log("this is number", number);
-			}
+		async.waterfall([
+			getPageNumber,
+			getApamanData
+		], (err, result) => {
+			console.log("this is result from waterfall", result);
 		});
 
+		function getPageNumber(callback){
+			request(apamanString, (err, res, html) => {
+				if(!err){
+					$ = cheerio.load(html);
 
-		// var apaman = 'http://www.apamanshop.com/tokyo/';
-		// var apamanTest = 'http://www.apamanshop.com/tokyo/104/?madori=10-11-12-14-21-22&tinryo1=20000&tinryo2=100000&senyu1=15&senyu2=30&nensu=1&toho=7&chintai_plan=chintai';
-		// var apaman = 'http://www.apamanshop.com/tokyo/';
-		// var apamanTest = 'http://www.apamanshop.com/tokyo/104/?madori=10-11-12-14-21-22&tinryo1=20000&tinryo2=100000&senyu1=15&senyu2=30&nensu=1&toho=7&chintai_plan=chintai';
-		
-		// var apamanTest3= 'http://www.apamanshop.com/tokyo/104-115-119-110-113/?page=1&tinryo2=9999999&senyu1=1&senyu2=99999'
+					var searchPageBottom = ($('.mod_pager'));
 
-		//createLink
-		//do pages here
+					searchPageBottom.each(function() {
+						numberPages = $(this).find('.next').prev().text();
+					});
 
-		// request(apamanTest2, (err, res, html) => {
-		// 	if(!err){
-		// 		$ = cheerio.load(html);
-		// 		var array = [];
+					var numberPages;
+					console.log("this is number", numberPages);
 
-		// 		var overallBox = $('.mod_box_section_bdt');
-				
-		// 		var numberOfPages = ($('.mod_pager'));
-		// 		var number;
+					//create page links
+					var apamanPages = '';
+					var apamanLinks = [];
 
-		// 		numberOfPages.each(function() {
-		// 			number = $(this).find('.next').prev().text();
-		// 		});
+					//create unique links
 
-		// 		console.log("this is number", number);
-				
-		// 		// console.log(res.body);
+					for(var i = 1; i <= 1; i++){
+						var j = 0;
+						while(j < apamanParts.length){
 
-		// 		// overallBox.each(function() {
-		// 		// 	array.push({
-		// 		// 		buildingName: $(this).find($('.name')).text(),
-		// 		// 		link: 'http://www.apamanshop.com/' + $(this).find($('.box_head_result')).find($('a')).attr('href'),
-		// 		// 		location: $(this).find($('.address')).text(),
-		// 		// 		trainStation: $(this).find($('.list_info')).find($('li')).text(),
-		// 		// 		priceRange: $(this).find($('.info')).find($('.price')).text(),
-		// 		// 		propertiesAvailable: $(this).find($('tbody')).find($('tr')).length-$(this).find($('tbody')).find($('.tr_under')).length-1
-		// 		// 	});
-		// 		// });
+							if(j === 1){
+								apamanPages = apamanPages + apamanParts[j] + `?page=${i}`;
+							}
 
-		// 		// console.log(array);
-		// 	}
-		// })
+							else if(j !== 1 && j !== apamanParts.length - 1) {
+								apamanPages += apamanParts[j];
+							}
 
+							j++;
+						}
 
+						apamanLinks.push(apamanPages);
+						apamanPages = '';
+					}
+
+					console.log(apamanLinks);
+					//make async calls
+					callback(null, apamanLinks);
+					
+				}
+			});
+		} 
+
+		function getApamanData(links, callback){
+			//createLink
+			//do pageData here
+			console.log('these are links in getApamanData', links);
+
+			var array = [];
+			var count = 0;
+			var linksLength = links.length;
+			//make next a callback
+			async.whilst(
+				function() { 
+					return count < linksLength; 
+				},
+				function(cb){
+					var link = links[count];
+					request(link, (err, res, html) => {
+						if(!err){
+							$ = cheerio.load(html);
+
+							var overallBox = $('.mod_box_section_bdt');
+
+							overallBox.each(function() {
+								array.push({
+									buildingName: $(this).find($('.name')).text(),
+									link: 'http://www.apamanshop.com/' + $(this).find($('.box_head_result')).find($('a')).attr('href'),
+									location: $(this).find($('.address')).text(),
+									trainStation: $(this).find($('.list_info')).find($('li')).text(),
+									priceRange: $(this).find($('.info')).find($('.price')).text(),
+									propertiesAvailable: $(this).find($('tbody')).find($('tr')).length-$(this).find($('tbody')).find($('.tr_under')).length-1
+								});
+							});
+
+							count++;
+							cb();
+						}
+					});
+				}, function(err) {
+					if(err) {
+						console.log('A link failed to process');
+					}
+
+					else {
+						console.log('All links have been processed successfully');
+						console.log('this is outside of async.each', array);
+						callback(null, array);
+				    }
+				});
+			
+		}
 
 
 		res.send(ward);
