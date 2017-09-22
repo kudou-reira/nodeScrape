@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import { Button, ToggleButtonGroup, ButtonToolbar, ToggleButton } from 'react-bootstrap';
+import { Button, ToggleButtonGroup, ButtonToolbar, ToggleButton, Modal } from 'react-bootstrap';
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
+import CardsModal from './cardsModal';
 
 import tokyoValues from '../lib/tokyo/tokyoValues';
 import roomSize from '../lib/roomParams/roomSize';
@@ -39,8 +40,10 @@ class SelectBoxes extends Component {
 			depositMoney: false,
 			keyMoney: false,
 			priceError: false,
-			areaError: false
+			areaError: false,
+			submitted: false
 		}
+
 	}
 
 
@@ -259,6 +262,7 @@ class SelectBoxes extends Component {
 
 	}
 
+
 	submitInfo(e) {
 
 		if(this.state.placesToSearch.length < 1){
@@ -278,8 +282,6 @@ class SelectBoxes extends Component {
 			this.setState({ areaError: true});
 		}
 
-
-
 		else{
 			this.props.searchParamsWard(
 				this.state.placesToSearch, 
@@ -295,8 +297,20 @@ class SelectBoxes extends Component {
 			);
 
 			this.setState({ priceError: false, areaError: false, placesToSearchError: false, sizeToSearchError: false });
-		}
-		
+
+			console.log("this is the state of submitted", this.state.submitted);
+
+			var x = this.state.submitted;
+			console.log(x);
+			var x = !x;
+			console.log(x);
+			this.setState({submitted: x}, () => {
+					console.log(this.state.submitted);
+					this.props.modalLogic(this.state.submitted);
+					this.setState({submitted: false});
+				});
+			}
+
 	}
 
 	render(){
@@ -408,9 +422,18 @@ class SelectBoxes extends Component {
 						Submit
 				    </Button>
 			    </div>
+			    <CardsModal />
+			    {console.log('these are results', this.props.results)}
+
 		    </div>
 		);
 	}
 }
 
-export default connect(null, actions)(SelectBoxes);
+function mapStateToProps(state){
+	return {
+		results: state.search.resultValuesWard
+	};
+}
+
+export default connect(mapStateToProps, actions)(SelectBoxes);

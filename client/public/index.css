@@ -17,6 +17,10 @@ h3{
     text-align:left;
 }
 
+.custom-modal{
+    width: 90%;
+}
+
 .navbar .nav > li > a {
     float: none;
     line-height: 19px;

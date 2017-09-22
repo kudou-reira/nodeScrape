@@ -37,7 +37,18 @@ module.exports = (app) => {
 			getPageNumber,
 			getApamanData
 		], (err, result) => {
-			console.log("this is result from waterfall", result);
+
+			if(err){
+				res.send();
+			}
+
+			else{
+				result.sort(function(a, b) {
+			    	return a.averagePrice - b.averagePrice;
+				});
+				res.send(result);
+			}
+			
 		});
 
 		function getPageNumber(callback){
@@ -115,6 +126,7 @@ module.exports = (app) => {
 									location: $(this).find($('.address')).text(),
 									trainStation: $(this).find($('.list_info')).find($('li')).text(),
 									priceRange: $(this).find($('.info')).find($('.price')).text(),
+									averagePrice: averageApaman($(this).find($('.info')).find($('.price')).text()),
 									propertiesAvailable: $(this).find($('tbody')).find($('tr')).length-$(this).find($('tbody')).find($('.tr_under')).length-1
 								});
 							});
@@ -125,11 +137,10 @@ module.exports = (app) => {
 					});
 				}, function(err) {
 					if(err) {
-						console.log('A link failed to process');
+						return err;
 					}
 
 					else {
-						console.log('All links have been processed successfully');
 						console.log('this is outside of async.each', array);
 						callback(null, array);
 				    }
@@ -137,8 +148,32 @@ module.exports = (app) => {
 			
 		}
 
+		function averageApaman(text){
+			var newStr = text.replace("～", ",").replace("万円", "");
+			var arr = newStr.split(',');
+			var averageValue = 0;
+			var tempArr = [];
 
-		res.send(ward);
+			for (var i = 0; i < arr.length; i++){
+				tempArr.push(Number(arr[i]));
+			}
+
+			averageValue = (tempArr[0]+tempArr[1])/tempArr.length;
+
+			if(countDecimals(averageValue) > 1){
+				return averageValue.toFixed(2);
+			}
+
+			else{
+				return averageValue;
+			}
+		}
+
+		function countDecimals (value) {
+		    if(Math.floor(value) === value) return 0;
+		    return value.toString().split(".")[1].length || 0; 
+		}
+
 	});
 
 	app.get('/api/save', requireLogin, async (req, res) => {

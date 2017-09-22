@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { FETCH_USER, SEARCH_PARAMS_WARD } from './types';
+import { FETCH_USER, SEARCH_PARAMS_WARD, MODAL_LOGIC } from './types';
 
 //async dispatch is a function
 export const fetchUser = () => async dispatch => {
@@ -31,4 +31,11 @@ export const searchParamsWard = (ward, roomType, lowPrice, highPrice, lowerRoom,
 				})
 			})
 	}
+};
+
+export const modalLogic = (value) => {
+	return({
+		type: MODAL_LOGIC,
+		payload: value
+	})
 };
