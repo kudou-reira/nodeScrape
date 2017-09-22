@@ -38,16 +38,12 @@ module.exports = (app) => {
 			getApamanData
 		], (err, result) => {
 
-			if(err){
-				res.send();
-			}
+			result.sort(function(a, b) {
+		    	return a.averagePrice - b.averagePrice;
+			});
 
-			else{
-				result.sort(function(a, b) {
-			    	return a.averagePrice - b.averagePrice;
-				});
-				res.send(result);
-			}
+			console.log(result)
+			res.send(result);
 			
 		});
 
@@ -141,7 +137,7 @@ module.exports = (app) => {
 					}
 
 					else {
-						console.log('this is outside of async.each', array);
+						// console.log('this is outside of async.each', array);
 						callback(null, array);
 				    }
 				});
@@ -161,11 +157,11 @@ module.exports = (app) => {
 			averageValue = (tempArr[0]+tempArr[1])/tempArr.length;
 
 			if(countDecimals(averageValue) > 1){
-				return averageValue.toFixed(2);
+				return Number(averageValue.toFixed(2));
 			}
 
 			else{
-				return averageValue;
+				return Number(averageValue);
 			}
 		}
 
