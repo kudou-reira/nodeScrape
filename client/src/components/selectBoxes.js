@@ -316,6 +316,9 @@ class SelectBoxes extends Component {
 	render(){
 		return(
 			<div className="container-fluid">
+			 	<div className="spaceTop">
+			    	{this.renderErrors()}
+			    </div>
 				<div className="spaceTop">
 					<div>
 						<div className="formatInner">
@@ -413,9 +416,6 @@ class SelectBoxes extends Component {
 							{this.renderKey()}
 						</ButtonToolbar>
 					</div>
-			    </div>
-			    <div className="spaceTop">
-			    	{this.renderErrors()}
 			    </div>
 			    <div className="spaceBottom">
 				    <Button className="spaceTop" type="submit" onClick={this.submitInfo.bind(this)}>
