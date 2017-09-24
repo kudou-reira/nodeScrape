@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Button, ButtonToolbar, Modal } from 'react-bootstrap';
+import ReactPaginate from 'react-paginate';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
 
@@ -9,18 +10,107 @@ class CardsModal extends Component {
 		super();
 
 		this.state = {
-			
+			paginationIntervals: 13,
+			ascendingPrice: true,
+			descendingPrice: false,
+			pageChosen: 0,
+			pageCount: 0
 		}
 
 		this.closeModal = this.closeModal.bind(this)
 	}
 
+	componentWillReceiveProps(nextProps){
+		if(nextProps.results !== this.props.results){
+			
+			this.setState({ pageCount:  Math.ceil(nextProps.results.length/this.state.paginationIntervals) }, () => {
+				console.log("pageCount in receive props", this.state.pageCount);
+			});
+			
+		}
+	}
+
 	closeModal() {
-    	// this.setState({showModal: false}, () => {
-    	// 	console.log(this.state.showModal);
-    	// });
 
     	this.props.modalLogic(false);
+    }
+
+    formatTrainStations(value) {
+    	var format = value.map((data) => {
+    		return(
+    			<p>{data}</p>
+    		)
+    	})
+
+    	return format;
+    }
+
+    renderSingleCard(){
+
+    	if(this.props.results !== null){
+
+    		var tempResults = this.props.results;
+	    	var chunkedResults = this.assignPaginationValues(tempResults);
+
+	    	var chunkedSelectedPage = this.selectedPage(chunkedResults);
+
+    		var values = chunkedSelectedPage.map((data) => {
+	    		return(
+	    			<article className="card">
+	                    <div className="single">
+	                   	    <div className="spacing">
+							    <h1>{data.buildingName}</h1>
+							    <hr className="style2" />
+							    <p className="title">{data.location}</p>
+							    <p>Price Range: {data.priceRange}</p>
+							    <p>Nearby Stations: </p>{this.formatTrainStations(data.trainStation)}
+							    <p>Properties available: {data.propertiesAvailable}</p>
+						    </div>
+						    <h2><Button className="cardButton1"><a href={data.link} target="_blank">More information</a></Button></h2>
+						</div>
+	                </article>
+	    		);
+	    	})
+
+	    	return values;
+    	}
+    	
+    }
+
+    assignPaginationValues(tempResults){
+    	var newStart = 0;
+    	var chunkResults = tempResults;
+    	for(var i = 0; i < Math.ceil(chunkResults.length/this.state.paginationIntervals); i++){
+    		for(var j = newStart; j < newStart + this.state.paginationIntervals; j++){
+    			if(typeof chunkResults[j] !== 'undefined'){
+    				chunkResults[j].index = i;
+    			}
+    		}
+    		newStart += this.state.paginationIntervals;
+    	}
+
+    	return chunkResults;
+    }
+
+    selectedPage(value){
+
+    	var selected = value.filter((data) => {
+    		if(data.index === this.state.pageChosen){
+    			return data;
+    		}
+    	})
+
+    	return selected;
+    }
+
+    handlePageClick(data){
+    	var selected = data.selected;
+
+    	console.log("current state", this.state.pageChosen);
+    	this.setState({ pageChosen: selected }, () => {
+    		console.log("this is pageChosen in handlePageClick", this.state.pageChosen);
+    	});
+
     }
 
 	render(){
@@ -35,32 +125,28 @@ class CardsModal extends Component {
 		            <Modal.Title id="contained-modal-title-lg">Modal heading</Modal.Title>
 		          </Modal.Header>
 		          <Modal.Body>
-		          	<div>
+		          	<div className="container">
 			            <section className="cards">
-			                <article className="card">
-			                    <div className="single">
-			                   	    <div className="spacing">
-									    <h1>John Doe</h1>
-									    <p className="title">CEO & Founder, Example</p>
-									    <p>Harvard University</p>
-								    </div>
-								  <h2><Button className="cardButton1">More information</Button></h2>
-								</div>
-			                </article>
-						    <article className="card">
-						       <p>content for card two</p>
-						    </article>
-							<article className="card">
-						        <p>content for card three</p>
-						    </article>
-							<article className="card">
-						        <p>content for card four</p>
-						    </article>
+			            	{this.renderSingleCard()}
 						</section>
 				    </div>
 		          </Modal.Body>
 		          <Modal.Footer>
-		            <Button onClick={this.closeModal}>Close</Button>
+		          	<div className="center1">
+			          	<ReactPaginate 
+			          		previousLabel={"previous"}
+			          		nextLabel={"next"}
+			          		breakLabel={<a href="#">...</a>}
+			          		breakClassName={"break-me"}
+			          		marginPagesDisplayed={1}
+			          		pageRangeDisplayed={5}
+			          		containerClassName={"pagination"}
+			          		subContainerClassName={"pages pagination"}
+			          		activeClassName={"active"}
+			          		pageCount={this.state.pageCount}
+			          		onPageChange={(data) => this.handlePageClick(data)}
+			          	/>
+		          	</div>
 		          </Modal.Footer>
 		        </Modal>
 			</ButtonToolbar>

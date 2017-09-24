@@ -67,7 +67,7 @@ module.exports = (app) => {
 
 					//create unique links
 
-					for(var i = 1; i <= 1; i++){
+					for(var i = 1; i <= 3; i++){
 						var j = 0;
 						while(j < apamanParts.length){
 
@@ -120,7 +120,7 @@ module.exports = (app) => {
 									buildingName: $(this).find($('.name')).text(),
 									link: 'http://www.apamanshop.com/' + $(this).find($('.box_head_result')).find($('a')).attr('href'),
 									location: $(this).find($('.address')).text(),
-									trainStation: $(this).find($('.list_info')).find($('li')).text(),
+									trainStation: formatApamanTrains($(this).find($('.list_info')).find($('li')).text()),
 									priceRange: $(this).find($('.info')).find($('.price')).text(),
 									averagePrice: averageApaman($(this).find($('.info')).find($('.price')).text()),
 									propertiesAvailable: $(this).find($('tbody')).find($('tr')).length-$(this).find($('tbody')).find($('.tr_under')).length-1
@@ -144,7 +144,7 @@ module.exports = (app) => {
 			
 		}
 
-		function averageApaman(text){
+		function averageApaman(text) {
 			var newStr = text.replace("～", ",").replace("万円", "");
 			var arr = newStr.split(',');
 			var averageValue = 0;
@@ -168,6 +168,16 @@ module.exports = (app) => {
 		function countDecimals (value) {
 		    if(Math.floor(value) === value) return 0;
 		    return value.toString().split(".")[1].length || 0; 
+		}
+
+		function formatApamanTrains (value) {
+			var re = /(分)/g;
+			var str = value
+			var subst = '分,'
+			var result = str.replace(re, subst);
+			var newText = result.split(',');
+			newText.pop();
+			return newText;
 		}
 
 	});

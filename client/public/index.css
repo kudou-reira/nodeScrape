@@ -34,9 +34,12 @@ h3{
 .single {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
     max-width: 350px;
-    margin: auto;
-    text-align: center;
-    padding-top: 0.5%;
+    margin-left: 4%;
+    margin-right: 4%;
+    margin-top: auto;
+    margin-bottom: auto;
+    text-align: center; 
+    padding-top: 1%;
 }
 
 .title {
@@ -44,6 +47,27 @@ h3{
     font-size: 18px;
 }
 
+.spacing {
+    margin-left: 6%;
+    margin-right: 6%;
+}
+
+hr.style2 {
+    border-top: 3px double #8c8b8b;
+}
+
+.center {
+    margin: 0 auto;
+}
+
+.center1{
+    display: flex;
+    justify-content: center;
+}
+
+.container{
+    max-width: 140%;
+}
 
 .cardButton1 {
     border: none;
@@ -64,7 +88,7 @@ h3{
     display: inline-block;
     padding: 8px;
     color: white;
-    background-color: #000;
+    background-color: #DFE7ED;
     text-align: center;
     cursor: pointer;
     width: 100%;
@@ -77,7 +101,7 @@ h3{
     display: inline-block;
     padding: 8px;
     color: white;
-    background-color: #000;
+    background-color: #EDDFDF;
     text-align: center;
     cursor: pointer;
     width: 100%;

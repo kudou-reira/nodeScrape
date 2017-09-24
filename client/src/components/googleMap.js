@@ -18,7 +18,7 @@ class GoogleMap extends Component {
 	render() {
 		return(
 			<div id="content">
-				<div ref="map" style={{width: 500, height: 500, }}/>
+				<div ref="map" style={{ width: 500, height: 500, }}/>
 			</div>
 		);
 	}

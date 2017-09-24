@@ -422,7 +422,7 @@ class SelectBoxes extends Component {
 						Submit
 				    </Button>
 			    </div>
-			    <CardsModal />
+			    <CardsModal results={this.props.results} />
 			    {console.log('these are results', this.props.results)}
 
 		    </div>
