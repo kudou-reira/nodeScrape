@@ -17,10 +17,13 @@
     }
   },
   "dependencies": {
+    "evil-icons": "^1.9.0",
     "lodash": "^4.17.4",
     "react": "^15.6.1",
+    "react-addons-css-transition-group": "^15.6.0",
     "react-bootstrap": "^0.31.3",
     "react-dom": "^15.6.1",
+    "react-icons": "^2.2.5",
     "react-paginate": "^4.4.4",
     "react-redux": "^5.0.6",
     "react-router-dom": "^4.2.2",

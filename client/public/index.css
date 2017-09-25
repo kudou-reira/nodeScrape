@@ -52,6 +52,15 @@ h3{
     margin-right: 6%;
 }
 
+.lock:hover .icon-unlock,
+.lock .icon-lock {
+    display: none;
+}
+
+.lock:hover .icon-lock {
+    display: inline;
+}
+
 hr.style2 {
     border-top: 3px double #8c8b8b;
 }
@@ -106,6 +115,33 @@ hr.style2 {
     cursor: pointer;
     width: 100%;
     font-size: 18px;
+}
+
+.example-enter {
+  opacity: 0.01;
+}
+
+.example-enter.example-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.example-leave {
+  opacity: 1;
+}
+
+.example-leave.example-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
+}
+
+.example-appear {
+  opacity: 0.01;
+}
+
+.example-appear.example-appear-active {
+  opacity: 1;
+  transition: opacity .5s ease-in;
 }
  
 @media screen and (min-width: 40em) {

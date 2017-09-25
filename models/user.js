@@ -6,9 +6,12 @@ const userSchema = new Schema({
 	facebookId: String,
 	twitterId: String,
 	savedPlaces: [{
-		address: String,
-		price: Number,
-		roomType: String
+		buildingName: String,
+		link: String,
+		location: String,
+		priceRange: String,
+		propertiesAvailable: Number,
+		averagePrice: Number
 	}]
 });
 

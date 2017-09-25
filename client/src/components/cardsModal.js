@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
 import { Button, ButtonToolbar, Modal } from 'react-bootstrap';
+import FaHeartO from 'react-icons/lib/fa/heart-o';
+import FaHeart from 'react-icons/lib/fa/heart';
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import ReactPaginate from 'react-paginate';
 import { connect } from 'react-redux';
 import * as actions from '../actions';
+
 
 class CardsModal extends Component {
 
@@ -23,7 +27,7 @@ class CardsModal extends Component {
 	componentWillReceiveProps(nextProps){
 		if(nextProps.results !== this.props.results){
 			
-			this.setState({ pageCount:  Math.ceil(nextProps.results.length/this.state.paginationIntervals) }, () => {
+			this.setState({ pageCount: Math.ceil(nextProps.results.length/this.state.paginationIntervals) }, () => {
 				console.log("pageCount in receive props", this.state.pageCount);
 			});
 			
@@ -31,7 +35,6 @@ class CardsModal extends Component {
 	}
 
 	closeModal() {
-
     	this.props.modalLogic(false);
     }
 
@@ -45,6 +48,25 @@ class CardsModal extends Component {
     	return format;
     }
 
+    clickIcon(data){
+
+    	//ADD IN ACTION CREATOR CALL SAVE CaRD
+    	//ALSO FIGURE OUT HOW TO KEEP A HEART FILLED OR NOT
+    	console.log('hi from click icon', data);
+    }
+
+    renderHeart(data){
+    	if(this.props.auth){
+    		return(
+	    		<a href="#" className="lock">
+			    	<FaHeartO className="icon-unlock" onClick={() => this.clickIcon(data)} />
+			    	<FaHeart className="icon-lock" color='red' onClick={() => this.clickIcon(data)}/>
+			    </a>
+	    	);
+    	}
+    	
+    }
+
     renderSingleCard(){
 
     	if(this.props.results !== null){
@@ -53,6 +75,8 @@ class CardsModal extends Component {
 	    	var chunkedResults = this.assignPaginationValues(tempResults);
 
 	    	var chunkedSelectedPage = this.selectedPage(chunkedResults);
+
+	    	//pass the data of clicked or not into renderHeart
 
     		var values = chunkedSelectedPage.map((data) => {
 	    		return(
@@ -65,6 +89,7 @@ class CardsModal extends Component {
 							    <p>Price Range: {data.priceRange}</p>
 							    <p>Nearby Stations: </p>{this.formatTrainStations(data.trainStation)}
 							    <p>Properties available: {data.propertiesAvailable}</p>
+							    {this.renderHeart(data)}
 						    </div>
 						    <h2><Button className="cardButton1"><a href={data.link} target="_blank">More information</a></Button></h2>
 						</div>
@@ -93,7 +118,6 @@ class CardsModal extends Component {
     }
 
     selectedPage(value){
-
     	var selected = value.filter((data) => {
     		if(data.index === this.state.pageChosen){
     			return data;
@@ -127,7 +151,7 @@ class CardsModal extends Component {
 		          <Modal.Body>
 		          	<div className="container">
 			            <section className="cards">
-			            	{this.renderSingleCard()}
+	            			{this.renderSingleCard()}
 						</section>
 				    </div>
 		          </Modal.Body>
@@ -156,7 +180,8 @@ class CardsModal extends Component {
 
 function mapStateToProps(state) {
 	return {
-		modal: state.modal.value
+		modal: state.modal.value,
+		auth: state.auth
 	};
 }
 
