@@ -53,6 +53,7 @@ class CardsModal extends Component {
     	//ADD IN ACTION CREATOR CALL SAVE CaRD
     	//ALSO FIGURE OUT HOW TO KEEP A HEART FILLED OR NOT
     	console.log('hi from click icon', data);
+    	this.props.saveCard(data);
     }
 
     renderHeart(data){

@@ -40,18 +40,14 @@ export const modalLogic = (value) => {
 	})
 };
 
-export const saveCard = (card) => {
-	return (dispatch) => {
-		axios.get('/api/save', {
-			params: {
-				card
-			}
-		})
-			.then(({ data }) => {
-				dispatch({
-					type:SAVE_CARD,
-					payload: data
-				})
-			})
-	}
+export const saveCard = (card) => async dispatch => {
+
+	const res = await axios.post('/api/save', {
+					params: {
+						card
+					}
+				});
+
+	dispatch({ type: FETCH_USER, payload: res.data });
+
 }
