@@ -14,7 +14,7 @@ class CardsModal extends Component {
 		super();
 
 		this.state = {
-			paginationIntervals: 13,
+			paginationIntervals: 12,
 			ascendingPrice: true,
 			descendingPrice: false,
 			pageChosen: 0,
@@ -65,7 +65,6 @@ class CardsModal extends Component {
 			    </a>
 	    	);
     	}
-    	
     }
 
     renderSingleCard(){
@@ -76,6 +75,8 @@ class CardsModal extends Component {
 	    	var chunkedResults = this.assignPaginationValues(tempResults);
 
 	    	var chunkedSelectedPage = this.selectedPage(chunkedResults);
+
+	    	console.log("this is renderSingleCard in modal", this.props.auth);
 
 	    	//pass the data of clicked or not into renderHeart
 

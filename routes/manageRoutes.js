@@ -17,4 +17,17 @@ module.exports = (app) => {
 		res.send(user);
 	});
 
+	app.post('/api/delete', requireLogin, async (req, res) => {
+
+		let card = req.body.params.card;
+
+		console.log("this is card from api delete", card);
+
+		req.user.savedPlaces.remove({"_id": card._id});
+
+		const user = await req.user.save();
+
+		res.send(user);
+	});
+
 }

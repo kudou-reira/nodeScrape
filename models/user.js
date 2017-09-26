@@ -11,7 +11,8 @@ const userSchema = new Schema({
 		location: String,
 		priceRange: String,
 		propertiesAvailable: Number,
-		averagePrice: Number
+		averagePrice: Number,
+		trainStation: [{type: String}]
 	}]
 });
 

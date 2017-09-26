@@ -11,20 +11,29 @@ body,html{
 	width:80%;
 }
 
+.container2{
+    width: 80%;
+}
+
 h3{
     margin-top: 2%;
     margin-bottom: 2%;
     text-align:left;
 }
 
+.well {
+    background: #FFFFFF;
+}
+
 .custom-modal{
     width: 90%;
 }
+
 .cards {
     display: flex;
     flex-wrap: wrap;
  }
- 
+
 .card {
     flex: 1 0 500px;
     box-sizing: border-box;
@@ -37,9 +46,24 @@ h3{
     margin-left: 4%;
     margin-right: 4%;
     margin-top: auto;
-    margin-bottom: auto;
     text-align: center; 
     padding-top: 1%;
+}
+
+.spaceTop {
+    margin-top: 2%;
+}
+
+.spaceBottom {
+    margin-bottom: 2%;
+}
+
+.spacing > p {
+    font-size: 14px !important;
+}
+
+.spacing > h1 {
+    font-size: 26px !important;
 }
 
 .title {
@@ -76,6 +100,19 @@ hr.style2 {
 
 .container{
     max-width: 140%;
+}
+
+.removeButton {
+    border: none;
+    outline: 0;
+    display: inline-block;
+    padding: 8px;
+    color: black;
+    background-color: #FFFFFF;
+    text-align: center;
+    cursor: pointer;
+    width: 100%;
+    font-size: 18px;
 }
 
 .cardButton1 {

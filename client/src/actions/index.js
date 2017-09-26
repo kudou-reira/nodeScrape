@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { FETCH_USER, SEARCH_PARAMS_WARD, MODAL_LOGIC, SAVE_CARD } from './types';
+import { FETCH_USER, SEARCH_PARAMS_WARD, MODAL_LOGIC, SAVE_CARD, DELETE_CATD } from './types';
 
 //async dispatch is a function
 export const fetchUser = () => async dispatch => {
@@ -43,6 +43,18 @@ export const modalLogic = (value) => {
 export const saveCard = (card) => async dispatch => {
 
 	const res = await axios.post('/api/save', {
+					params: {
+						card
+					}
+				});
+
+	dispatch({ type: FETCH_USER, payload: res.data });
+
+}
+
+export const deleteCard = (card) => async dispatch => {
+
+	const res = await axios.post('/api/delete', {
 					params: {
 						card
 					}

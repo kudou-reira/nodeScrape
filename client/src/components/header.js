@@ -55,7 +55,7 @@ class Header extends Component {
 			    <Navbar.Header>
 			      <Navbar.Brand>
 			        <Link to={this.props.auth ? '/saved-locations' : '/'}>
-			        	Rent in Japan
+			        	{this.props.auth ? 'Saved Locations' : 'Rent in Japan'}
 			        </Link>
 			      </Navbar.Brand>
 			      <Navbar.Toggle />

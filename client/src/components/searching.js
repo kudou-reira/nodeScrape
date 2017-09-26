@@ -7,7 +7,7 @@ class Searching extends Component {
 	render(){
 		return(
 			<div>
-				<h2>Search Japan for Apartments</h2>
+				<h2 className="spaceTop spaceBottom">Search Japan for Apartments</h2>
 				<GoogleMap />
 				<SelectBoxes />
 			</div>
