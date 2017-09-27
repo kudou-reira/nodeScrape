@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { FETCH_USER, SEARCH_PARAMS_WARD, MODAL_LOGIC, SAVE_CARD, DELETE_CATD } from './types';
+import { FETCH_USER, SEARCH_PARAMS_WARD, MODAL_LOGIC, FIND_CARD } from './types';
 
 //async dispatch is a function
 export const fetchUser = () => async dispatch => {
@@ -49,17 +49,26 @@ export const saveCard = (card) => async dispatch => {
 				});
 
 	dispatch({ type: FETCH_USER, payload: res.data });
-
 }
 
-export const deleteCard = (card) => async dispatch => {
+export const deleteCardCollapse = (card) => async dispatch => {
 
-	const res = await axios.post('/api/delete', {
+	const res = await axios.post('/api/deleteCollapse', {
 					params: {
 						card
 					}
 				});
 
 	dispatch({ type: FETCH_USER, payload: res.data });
+}
 
+export const deleteCardModal = (card) => async dispatch => {
+
+	const res = await axios.post('/api/deleteModal', {
+					params: {
+						card
+					}
+				});
+
+	dispatch({ type: FETCH_USER, payload: res.data });
 }

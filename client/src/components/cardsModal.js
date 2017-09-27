@@ -21,7 +21,8 @@ class CardsModal extends Component {
 			pageCount: 0
 		}
 
-		this.closeModal = this.closeModal.bind(this)
+		this.closeModal = this.closeModal.bind(this);
+		this.checkInDatabase = this.checkInDatabase.bind(this);
 	}
 
 	componentWillReceiveProps(nextProps){
@@ -48,7 +49,7 @@ class CardsModal extends Component {
     	return format;
     }
 
-    clickIcon(data){
+    clickIconAdd(data){
 
     	//ADD IN ACTION CREATOR CALL SAVE CaRD
     	//ALSO FIGURE OUT HOW TO KEEP A HEART FILLED OR NOT
@@ -56,14 +57,44 @@ class CardsModal extends Component {
     	this.props.saveCard(data);
     }
 
+    clickIconRemove(data){
+    	console.log('hi from remove icon', data);
+    	this.props.deleteCardModal(data);
+    }
+
+    checkInDatabase(data){
+    	var propsPlaces = this.props.auth.savedPlaces;
+		for(var i = 0; i < propsPlaces.length; i++){
+			if(data.link === propsPlaces[i].link){
+				return true;
+			}
+		}
+    }
+
     renderHeart(data){
     	if(this.props.auth){
-    		return(
-	    		<a href="#" className="lock">
-			    	<FaHeartO className="icon-unlock" onClick={() => this.clickIcon(data)} />
-			    	<FaHeart className="icon-lock" color='red' onClick={() => this.clickIcon(data)}/>
-			    </a>
-	    	);
+    		//check if in database
+    		//just check if in database, don't need state
+    		//use the result to see if it should show up shadeded or not
+    		if(this.checkInDatabase(data)){
+    			return(
+    				<a href="#" className="lock">
+				    	<FaHeartO className="icon-lock" onClick={() => this.clickIconRemove(data)} />
+				    	<FaHeart className="icon-unlock" color='red' onClick={() => this.clickIconRemove(data)} />
+				    </a>
+    			);
+    		}
+
+    		else{
+    			return(
+		    		<a href="#" className="lock">
+				    	<FaHeartO className="icon-unlock" onClick={() => this.clickIconAdd(data)} />
+				    	<FaHeart className="icon-lock" color='red' onClick={() => this.clickIconAdd(data)}/>
+				    </a>
+
+		    	);
+    		}
+
     	}
     }
 
@@ -183,7 +214,8 @@ class CardsModal extends Component {
 function mapStateToProps(state) {
 	return {
 		modal: state.modal.value,
-		auth: state.auth
+		auth: state.auth,
+		cardExists: state.search.cardExists
 	};
 }
 

@@ -47,7 +47,7 @@ class Dashboard extends Component {
     }
 
     clickIcon(data){
-    	this.props.deleteCard(data);
+    	this.props.deleteCardCollapse(data);
     }
 
 	renderSavedLocations(){
@@ -78,49 +78,53 @@ class Dashboard extends Component {
 
 	renderCollapse(){
 		if(this.props.auth !== null){
-			if(this.props.auth.savedPlaces.length < 1){
-				return(
-					<div>
-						<Button onClick={ ()=> this.setState({ collapseOn: !this.state.collapseOn })}>
-							Saved Locations
-				        </Button>
-				        <div className="spaceTop" />
-				        <Collapse in={this.state.collapseOn}>
-							<div>
-					            <Well>
-					            	<div className="container2">
-					            		<section className="cards">
-					                		{this.renderSavedLocations()}
-					                	</section>
-					                </div>
-					            </Well>
-				            </div>
-				        </Collapse>
-			        </div>
-				);
+			if(this.props.auth.savedPlaces !== undefined){
+				if(this.props.auth.savedPlaces.length < 1){
+					return(
+						<div>
+							<Button onClick={ ()=> this.setState({ collapseOn: !this.state.collapseOn })}>
+								Saved Locations
+					        </Button>
+					        <div className="spaceTop" />
+					        <Collapse in={this.state.collapseOn}>
+								<div>
+						            <Well>
+						            	<div className="container2">
+						            		<section className="cards">
+						                		{this.renderSavedLocations()}
+						                	</section>
+						                </div>
+						            </Well>
+					            </div>
+					        </Collapse>
+				        </div>
+					);
+				}
+
+				else{
+					return(
+						<div>
+							<Button onClick={ ()=> this.setState({ collapseOff: !this.state.collapseOff })}>
+								Saved Locations
+					        </Button>
+					        <div className="spaceTop" />
+					        <Collapse in={this.state.collapseOff}>
+								<div>
+						            <Well>
+						            	<div className="container2">
+						            		<section className="cards">
+						                		{this.renderSavedLocations()}
+						                	</section>
+						                </div>
+						            </Well>
+					            </div>
+					        </Collapse>
+				        </div>
+					);
+				}
 			}
 
-			else{
-				return(
-					<div>
-						<Button onClick={ ()=> this.setState({ collapseOff: !this.state.collapseOff })}>
-							Saved Locations
-				        </Button>
-				        <div className="spaceTop" />
-				        <Collapse in={this.state.collapseOff}>
-							<div>
-					            <Well>
-					            	<div className="container2">
-					            		<section className="cards">
-					                		{this.renderSavedLocations()}
-					                	</section>
-					                </div>
-					            </Well>
-				            </div>
-				        </Collapse>
-			        </div>
-				);
-			}
+			
 		}
 	}
 
