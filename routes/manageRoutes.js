@@ -37,14 +37,7 @@ module.exports = (app) => {
 
 		let card = req.body.params.card;
 		
-
 		console.log("this is card from api delete modal", card);
-
-		// for(var i = 0; i < savedPlaces.length; i++){
-		// 	if(savedPlaces[i].link === card.link){
-
-		// 	}
-		// }
 
 		var newSavedPlaces = req.user.savedPlaces.filter((place) => {
 			return place.link !== card.link
