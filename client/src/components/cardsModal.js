@@ -4,6 +4,9 @@ import FaHeartO from 'react-icons/lib/fa/heart-o';
 import FaHeart from 'react-icons/lib/fa/heart';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import ReactPaginate from 'react-paginate';
+import Select from 'react-select';
+import 'react-select/dist/react-select.css';
+
 import { connect } from 'react-redux';
 import * as actions from '../actions';
 
@@ -18,20 +21,25 @@ class CardsModal extends Component {
 			ascendingPrice: true,
 			descendingPrice: false,
 			pageChosen: 0,
-			pageCount: 0
+			pageCount: 0,
+			paginationPlaceHolder: 'Select desired results per page',
+			apiChoicesPlaceHolder: 'Select rental agents',
+			stayOpen: false,
+			disabled: false,
+			apiToUse: 'apaman,gaijinpot'
 		}
 
 		this.closeModal = this.closeModal.bind(this);
 		this.checkInDatabase = this.checkInDatabase.bind(this);
+		this.paginationChange = this.paginationChange.bind(this);
+		this.apiChoicesChange = this.apiChoicesChange.bind(this);
 	}
 
 	componentWillReceiveProps(nextProps){
 		if(nextProps.results !== this.props.results){
-			
 			this.setState({ pageCount: Math.ceil(nextProps.results.length/this.state.paginationIntervals) }, () => {
 				console.log("pageCount in receive props", this.state.pageCount);
 			});
-			
 		}
 	}
 
@@ -156,7 +164,6 @@ class CardsModal extends Component {
     			return data;
     		}
     	})
-
     	return selected;
     }
 
@@ -170,6 +177,68 @@ class CardsModal extends Component {
 
     }
 
+    paginationChange(val){
+    	this.setState({ paginationIntervals: val.value, paginationPlaceHolder: val.label }, () => {
+    		console.log(this.state.paginationPlaceHolder);
+    		this.setState({ pageCount: Math.ceil(this.props.results.length/this.state.paginationIntervals) }, () => {
+				console.log("pageCount in receive props", this.state.pageCount);
+			});
+    		console.log('new pagination intervals', this.state.paginationIntervals);
+    	})
+    }
+
+    renderPaginationIntervals(){
+    	var options = [
+    					{value: 12, label: '12 results per page'},
+    					{value: 16, label: '16 results per page'},
+    					{value: 20, label: '20 results per page'}
+    				  ];
+
+    	return(
+    		<div className="pages">
+	    		<div className="bind">
+	    			<Select
+	    				name="form-field-name"
+	    				placeholder={this.state.paginationPlaceHolder}
+	    				options={options}
+	    				onChange={this.paginationChange}
+	    			/>
+	    		</div>
+    		</div>
+    	);
+    }
+
+    apiChoicesChange(val){
+    	this.setState({ apiToUse: val }, () => {
+    		console.log(this.state.apiToUse);
+    		console.log("this is type of", typeof this.state.apiToUse);
+    	});
+    }
+
+    renderApiChoices(){
+    	var options = [
+    					{value: 'apaman', label: 'Apaman'},
+    					{value: 'gaijinpot', label: 'Gaijin Pot'}
+    				  ];
+
+    	return(
+    		<div className="api">
+	    		<div className="bind">
+					<Select
+						closeOnSelect={!this.state.stayOpen}
+						disabled={this.state.disabled}
+						multi={true}
+						onChange={this.apiChoicesChange}
+						options={options}
+						placeholder="Select your favourite(s)"
+						simpleValue
+						value={this.state.apiToUse}
+					/>
+	    		</div>
+    		</div>
+    	);
+    }
+
 	render(){
 		return(
 			<ButtonToolbar>
@@ -178,33 +247,57 @@ class CardsModal extends Component {
 		          onHide={this.closeModal}
 		          dialogClassName="custom-modal"
 		        >
-		          <Modal.Header closeButton>
-		            <Modal.Title id="contained-modal-title-lg">Modal heading</Modal.Title>
-		          </Modal.Header>
-		          <Modal.Body>
-		          	<div className="container">
-			            <section className="cards">
-	            			{this.renderSingleCard()}
-						</section>
-				    </div>
-		          </Modal.Body>
-		          <Modal.Footer>
-		          	<div className="center1">
-			          	<ReactPaginate 
-			          		previousLabel={"previous"}
-			          		nextLabel={"next"}
-			          		breakLabel={<a href="#">...</a>}
-			          		breakClassName={"break-me"}
-			          		marginPagesDisplayed={1}
-			          		pageRangeDisplayed={5}
-			          		containerClassName={"pagination"}
-			          		subContainerClassName={"pages pagination"}
-			          		activeClassName={"active"}
-			          		pageCount={this.state.pageCount}
-			          		onPageChange={(data) => this.handlePageClick(data)}
-			          	/>
-		          	</div>
-		          </Modal.Footer>
+			        {this.props.results !== null 
+			        	? <Modal.Header closeButton>
+				            <Modal.Title id="contained-modal-title-lg">Modal heading</Modal.Title>
+				            	<div className="wrapper">
+						            {this.renderPaginationIntervals()}
+						            {this.renderApiChoices()}
+					            </div>
+				          </Modal.Header>
+				        : <Modal.Header closeButton>
+				            <Modal.Title id="contained-modal-title-lg">Loading your results...</Modal.Title>
+				          </Modal.Header>
+			        }
+
+			        {this.props.results !== null 
+			        	? <Modal.Body>
+				          	<div className="container">
+					            <section className="cards">
+			            			{this.renderSingleCard()}
+								</section>
+						    </div>
+				          </Modal.Body>
+				        : <Modal.Body>
+				          	<div className="container">
+					            <div>
+			            			Loading your results...
+								</div>
+						    </div>
+				          </Modal.Body>
+			        }
+
+		            {this.props.results !== null 
+		            	? <Modal.Footer>
+				          	<div className="center1">
+					          	<ReactPaginate 
+					          		previousLabel={"previous"}
+					          		nextLabel={"next"}
+					          		breakLabel={<a href="#">...</a>}
+					          		breakClassName={"break-me"}
+					          		marginPagesDisplayed={1}
+					          		pageRangeDisplayed={5}
+					          		containerClassName={"pagination"}
+					          		subContainerClassName={"pages pagination"}
+					          		activeClassName={"active"}
+					          		pageCount={this.state.pageCount}
+					          		onPageChange={(data) => this.handlePageClick(data)}
+					          	/>
+				          	</div>
+			            </Modal.Footer>
+			            : null
+			        }
+		            
 		        </Modal>
 			</ButtonToolbar>
 		);

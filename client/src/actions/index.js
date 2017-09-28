@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { FETCH_USER, SEARCH_PARAMS_WARD, MODAL_LOGIC, FIND_CARD } from './types';
+import { FETCH_USER, SEARCH_PARAMS_WARD, MODAL_LOGIC } from './types';
 
 //async dispatch is a function
 export const fetchUser = () => async dispatch => {
