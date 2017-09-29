@@ -1,5 +1,8 @@
+const { conversionToString, conversionToRoom } = require('./data');
+
 const createApamanLink = (ward, roomType, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance) => {
 
+	console.log("create link VERY BEGINNING", roomType)
 	var wardFormat = '';
 	var roomTypeFormat = '';
 
@@ -14,7 +17,7 @@ const createApamanLink = (ward, roomType, lowPrice, highPrice, lowerRoom, higher
 	}
 
 	var roomType = roomType.sort(function(a, b){return a - b});
-	console.log("this is room type", roomType);
+	console.log("this is room type from handle params", roomType);
 
 	for(var i = 0; i < roomType.length; i++){
 		if(i === roomType.length-1){
@@ -75,6 +78,63 @@ const createApamanLink = (ward, roomType, lowPrice, highPrice, lowerRoom, higher
 	return dataArray;
 }
 
+const calculateRoomTypeGP = (val) => {
+
+	var lowestString;
+	var roomCode;
+	var tempArray = val;
+	var smallestVal;
+	tempArray = tempArray.sort((a, b) => {
+		return b - a
+	});
+
+	//smallestVal is a string
+	smallestVal = Number(tempArray[0]);
+
+	lowestString = conversionToString(smallestVal);
+	roomCode = conversionToRoom(lowestString)
+
+
+	console.log("roomCode", roomCode);
+
+	return roomCode;
+}
+
+const roomsList = (val) => {
+
+	var data = [
+		{size: '1R', code: 10},
+		{size: '1K', code: 11},
+		{size: '1DK', code: 12},
+		{size: '1LDK', code: 14},
+		{size: '2K', code: 21},
+		{size: '2DK', code: 22},
+		{size: '2LDK', code: 24},
+		{size: '3K', code: 31},
+		{size: '3DK', code: 32},
+		{size: '3LDK', code: 34},
+		{size: '4K', code: 41},
+		{size: '4DK', code: 42},
+		{size: '4LDK', code: 44},
+		{size: '5K+', code: 51}
+	]
+
+	var temp = val;
+	var list = [];
+
+	for(var i = 0; i < temp.length; i++){
+		for(var j = 0; j < data.length; j++){
+			if(Number(temp[i]) === data[j].code){
+				list.push(data[j].size);
+			}
+		}
+	}
+
+	return list;
+}
+
 module.exports = {
-	createApamanLink
+	createApamanLink,
+	calculateRoomTypeGP,
+	roomsList
 }

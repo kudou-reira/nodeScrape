@@ -6,6 +6,7 @@ import * as actions from '../actions';
 import CardsModal from './cardsModal';
 
 import tokyoValues from '../lib/tokyo/tokyoValues';
+import apiValues from '../lib/api/apiToUse';
 import roomSize from '../lib/roomParams/roomSize';
 import buildingAge from '../lib/roomParams/buildingAge';
 import walkingDistance from '../lib/roomParams/walkingDistance';
@@ -22,6 +23,8 @@ class SelectBoxes extends Component {
 			placesToSearch: [],
 			placesToSearchError: false,
 			tokyoPresets: tokyoValues,
+			apiPresets: apiValues,
+			apiToUse: ['apaman', 'gaijinpot'],
 			sizeToSearch: [],
 			sizeToSearchError: false,
 			roomPresets: roomSize,
@@ -43,9 +46,7 @@ class SelectBoxes extends Component {
 			areaError: false,
 			submitted: false
 		}
-
 	}
-
 
 	renderTokyo() {
 		var tempTokyo = this.alphabetize(this.state.tokyoPresets);
@@ -57,6 +58,18 @@ class SelectBoxes extends Component {
 			);
 		});
 		return tempTokyo;
+	}
+
+	renderApi() {
+		var tempApi = this.alphabetize(this.state.apiPresets);
+		tempApi = tempApi.map((api) => {
+			return(
+		    	<ToggleButton onChange={e => this.handleApiClick(e)} value={api.value} key={api.value}>
+		    		{api.name}
+		        </ToggleButton>
+			);
+		});
+		return tempApi;
 	}
 
 	renderRoomSize() {
@@ -198,6 +211,27 @@ class SelectBoxes extends Component {
 		}
 	}
 
+	handleApiClick(e) {
+		//checks if clicked or not, could be useful
+		//let isChecked = e.target.checked;
+		var checkedValue = e.target.value;
+	
+		var array = this.state.apiToUse.slice();
+
+		if(!array.includes(checkedValue)){
+			array.push(checkedValue);
+			this.setState({ apiToUse: array }, () => console.log(this.state.apiToUse));
+		}
+
+		else{
+			_.remove(array, (val) => {
+				return val === checkedValue;
+			});
+
+			this.setState({ apiToUse: array }, () => console.log(this.state.apiToUse));
+		}
+	}
+
 	handleRoomClick(e) {
 		//checks if clicked or not, could be useful
 		//let isChecked = e.target.checked;
@@ -240,6 +274,12 @@ class SelectBoxes extends Component {
 			)
 		}
 
+		else if(this.state.apiToUse.length < 1){
+			return(
+				<h2>No api selected!</h2>
+			)
+		}
+
 		else if(this.state.lowRoomToSearch >= this.state.highRoomToSearch && this.state.lowRoomToSearch !== 0){
 			return(
 				<h2>Lower room area is higher than or equal to higher room area!</h2>
@@ -273,6 +313,10 @@ class SelectBoxes extends Component {
 			this.setState({ sizeToSearchError: true });
 		}
 
+		else if(this.state.apiToUse.length < 1){
+			this.setState({ apitToUseError: true });
+		}
+
 		else if(this.state.lowPriceToSearch/10 >= this.state.highPriceToSearch/10 && this.state.lowPriceToSearch !== 0){
 			this.setState({ priceError: true });
 
@@ -293,11 +337,13 @@ class SelectBoxes extends Component {
 				this.state.depositMoney,
 				this.state.keyMoney,
 				this.state.buildingAge,
-				this.state.walkingDistance
+				this.state.walkingDistance,
+				this.state.apiToUse
 			);
 
-			this.setState({ priceError: false, areaError: false, placesToSearchError: false, sizeToSearchError: false });
+			this.setState({ priceError: false, areaError: false, placesToSearchError: false, sizeToSearchError: false, apiToUseError: false });
 
+			//control modal render here
 			console.log("this is the state of submitted", this.state.submitted);
 
 			var x = this.state.submitted;
@@ -310,7 +356,6 @@ class SelectBoxes extends Component {
 					this.setState({submitted: false});
 				});
 			}
-
 	}
 
 	render(){
@@ -319,6 +364,18 @@ class SelectBoxes extends Component {
 			 	<div className="spaceTop">
 			    	{this.renderErrors()}
 			    </div>
+			    <div className="spaceTop">
+					<div>
+						<div className="formatInner">
+							<h3>Api(s) to Use</h3>
+							<ButtonToolbar>
+								<ToggleButtonGroup type="checkbox" defaultValue={['apaman', 'gaijinpot']}>
+									{this.renderApi()}
+								</ToggleButtonGroup>
+							</ButtonToolbar>
+						</div>
+					</div>
+				</div>
 				<div className="spaceTop">
 					<div>
 						<div className="formatInner">
@@ -333,7 +390,7 @@ class SelectBoxes extends Component {
 				</div>
 				<div className="spaceTop">
 					<div className="formatInner">
-						<h3>Room Type</h3>
+						<h3>Desired Room Types</h3>
 						<ButtonToolbar>
 							<ToggleButtonGroup type="checkbox">
 								{this.renderRoomSize()}

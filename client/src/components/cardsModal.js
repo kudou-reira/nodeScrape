@@ -22,17 +22,20 @@ class CardsModal extends Component {
 			descendingPrice: false,
 			pageChosen: 0,
 			pageCount: 0,
-			paginationPlaceHolder: 'Select desired results per page',
+			paginationPlaceHolder: '12 results per page',
 			apiChoicesPlaceHolder: 'Select rental agents',
+			sortPlaceHolder: 'Ascending Price',
 			stayOpen: false,
 			disabled: false,
-			apiToUse: 'apaman,gaijinpot'
+			apiToUse: 'apaman,gaijinpot',
+			sortParam: 'low'
 		}
 
 		this.closeModal = this.closeModal.bind(this);
 		this.checkInDatabase = this.checkInDatabase.bind(this);
 		this.paginationChange = this.paginationChange.bind(this);
 		this.apiChoicesChange = this.apiChoicesChange.bind(this);
+		this.sortChange = this.sortChange.bind(this);
 	}
 
 	componentWillReceiveProps(nextProps){
@@ -129,10 +132,12 @@ class CardsModal extends Component {
 							    <p className="title">{data.location}</p>
 							    <p>Price Range: {data.priceRange}</p>
 							    <p>Nearby Stations: </p>{this.formatTrainStations(data.trainStation)}
+							    <p>Room Type: {data.roomType}</p>
+							    <p>Room Size: {data.roomSize}</p>
 							    <p>Properties available: {data.propertiesAvailable}</p>
 							    {this.renderHeart(data)}
 						    </div>
-						    <h2><Button className="cardButton1"><a href={data.link} target="_blank">More information</a></Button></h2>
+						    {this.renderCardButton(data)}
 						</div>
 	                </article>
 	    		);
@@ -141,6 +146,26 @@ class CardsModal extends Component {
 	    	return values;
     	}
     	
+    }
+
+    renderCardButton(data){
+    	if(data.averagePrice < 10) {
+    		return(
+    			<h2><Button className="cardButton1"><a href={data.link} target="_blank">More information</a></Button></h2>
+    		);
+    	}
+
+    	else if(data.averagePrice > 10 && data.averagePrice < 15) {
+    		return(
+    			<h2><Button className="cardButton2"><a href={data.link} target="_blank">More information</a></Button></h2>
+    		);
+    	}
+
+    	else {
+    		return(
+    			<h2><Button className="cardButton3"><a href={data.link} target="_blank">More information</a></Button></h2>
+    		);
+    	}
     }
 
     assignPaginationValues(tempResults){
@@ -239,6 +264,33 @@ class CardsModal extends Component {
     	);
     }
 
+    sortChange(val){
+    	this.setState({ sortVal: val }, () => {
+    		console.log(this.state.sortVal);
+    		console.log("this is type of", typeof this.state.apiToUse);
+    	});
+    }
+
+    renderSort() {
+    	var options = [
+    					{value: 'low', label: 'Ascending Price'},
+    					{value: 'high', label: 'Descending Price'}
+    				  ];
+
+    	return(
+    		<div className="sort">
+	    		<div className="bind">
+	    			<Select
+	    				name="form-field-name"
+	    				placeholder={this.state.sortPlaceHolder}
+	    				options={options}
+	    				onChange={this.sortChange}
+	    			/>
+	    		</div>
+    		</div>
+    	);
+    }
+
 	render(){
 		return(
 			<ButtonToolbar>
@@ -249,9 +301,10 @@ class CardsModal extends Component {
 		        >
 			        {this.props.results !== null 
 			        	? <Modal.Header closeButton>
-				            <Modal.Title id="contained-modal-title-lg">Modal heading</Modal.Title>
+				            <Modal.Title id="contained-modal-title-lg">Results</Modal.Title>
 				            	<div className="wrapper">
 						            {this.renderPaginationIntervals()}
+						            {this.renderSort()}
 						            {this.renderApiChoices()}
 					            </div>
 				          </Modal.Header>

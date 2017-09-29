@@ -8,7 +8,7 @@ export const fetchUser = () => async dispatch => {
 	dispatch({ type: FETCH_USER, payload: res.data });
 };
 
-export const searchParamsWard = (ward, roomType, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance) => {
+export const searchParamsWard = (ward, roomType, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance, api) => {
 	return (dispatch) => {
 		axios.get('/api/searchByWard', {
 			params: {
@@ -21,7 +21,8 @@ export const searchParamsWard = (ward, roomType, lowPrice, highPrice, lowerRoom,
 				deposit,
 				key,
 				age,
-				distance
+				distance,
+				api
 			}
 		})
 			.then(({ data }) => {

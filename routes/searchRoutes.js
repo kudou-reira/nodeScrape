@@ -2,7 +2,7 @@ const requireLogin = require('../middlewares/requireLogin');
 const cheerio = require('cheerio');
 const request = require('request');
 const async = require('async');
-const {createApamanLink} = require('../helperFunctions/handleParams');
+const { createApamanLink, calculateRoomTypeGP, roomsList } = require('../helperFunctions/handleParams');
 
 module.exports = (app) => {
 
@@ -18,10 +18,45 @@ module.exports = (app) => {
 		let key = req.query.key;
 		let age = req.query.age;
 		let distance = req.query.distance;
+		let api = req.query.api;
 
 		console.log(ward, roomType, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance);
 
 
+		var listOfRoomStrings = roomsList(roomType);
+		console.log("room type after roomslist", roomType);
+		var gaijinRoomType = calculateRoomTypeGP(roomType);
+		//gaijinROomType changes everything
+		console.log("room type after gaijin", roomType);
+
+
+		console.log("this is api", api);
+		console.log("this is gaijinRoomType", gaijinRoomType);
+		console.log("this is the list of rooms", listOfRoomStrings);
+
+		//convert roomType into array of 1LDK, 2LDK etc
+
+		//do conditional calls based on waterfall and async
+		//you can still define all the other functions
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		console.log("this is roomType before create Link", roomType);
 		var apamanParts = createApamanLink(ward, roomType, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance)
 		console.log("this is createLink", apamanParts);
 
@@ -32,6 +67,13 @@ module.exports = (app) => {
 		}
 
 		console.log("this is apamanString", apamanString);
+
+
+
+
+
+
+
 
 		async.waterfall([
 			getPageNumber,
@@ -67,7 +109,7 @@ module.exports = (app) => {
 
 					//create unique links
 
-					for(var i = 1; i <= 3; i++){
+					for(var i = 1; i <= 1; i++){
 						var j = 0;
 						while(j < apamanParts.length){
 
@@ -123,7 +165,10 @@ module.exports = (app) => {
 									trainStation: formatApamanTrains($(this).find($('.list_info')).find($('li')).text()),
 									priceRange: $(this).find($('.info')).find($('.price')).text(),
 									averagePrice: averageApaman($(this).find($('.info')).find($('.price')).text()),
-									propertiesAvailable: $(this).find($('tbody')).find($('tr')).length-$(this).find($('tbody')).find($('.tr_under')).length-1
+									propertiesAvailable: $(this).find($('tbody')).find($('tr')).length-$(this).find($('tbody')).find($('.tr_under')).length-1,
+									roomType: $(this).find($('tbody')).find($('.list_icn_room')).parent().next().next().next().children().first().text(),
+									roomSize: $(this).find($('tbody')).find($('.list_icn_room')).parent().next().next().next().children().first().next().text(),
+									api: 'apaman'
 								});
 							});
 

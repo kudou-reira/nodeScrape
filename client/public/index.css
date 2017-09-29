@@ -40,17 +40,22 @@ h3{
 }
 
 .wrapper {
-    width: 100%;
+    width: 90%;
 }
 
 .pages {
     float: right;
-    width: 50%;
+    width: 30%;
 }
 
 .api {
     float: right;
-    width: 50%;
+    width: 30%;
+}
+
+.sort {
+    float: right;
+    width: 30%;
 }
 
 .cards {
