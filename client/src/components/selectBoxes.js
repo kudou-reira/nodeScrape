@@ -194,6 +194,9 @@ class SelectBoxes extends Component {
 		//let isChecked = e.target.checked;
 		var checkedValue = e.target.value;
 
+		// var checkedValueSplit = e.target.value.split(',');
+
+		// console.log("this is target if more than one", checkedValueSplit);
 	
 		var array = this.state.placesToSearch.slice();
 

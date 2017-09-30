@@ -2,7 +2,7 @@ const requireLogin = require('../middlewares/requireLogin');
 const cheerio = require('cheerio');
 const request = require('request');
 const async = require('async');
-const { createApamanLink, calculateRoomTypeGP, roomsList } = require('../helperFunctions/handleParams');
+const { createGPLink, gpRoomCode, createApamanLink, apamanCity, apamanRoomCode } = require('../helperFunctions/handleParams');
 
 module.exports = (app) => {
 
@@ -23,18 +23,25 @@ module.exports = (app) => {
 		console.log(ward, roomType, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance);
 
 
-		var listOfRoomStrings = roomsList(roomType);
-		console.log("room type after roomslist", roomType);
-		var gaijinRoomType = calculateRoomTypeGP(roomType);
-		//gaijinROomType changes everything
-		console.log("room type after gaijin", roomType);
+		// var listOfRoomStrings = roomsList(roomType);
+		//list of room strings can take first and last a populate with 2ldsk etc
+
+		var apamanRmCode = apamanRoomCode(roomType);
+		console.log("this is apamanCode", apamanRmCode);
+
+		var gpRmCode = gpRoomCode(roomType);
+		console.log("this is gaijinPotCode", gpRmCode);
+
+		var apamanWardNames = apamanCity(ward);
+		console.log("this is apamanCity", apamanWardNames);
+
 
 
 		console.log("this is api", api);
-		console.log("this is gaijinRoomType", gaijinRoomType);
-		console.log("this is the list of rooms", listOfRoomStrings);
 
-		//convert roomType into array of 1LDK, 2LDK etc
+		// console.log("this is the list of rooms", listOfRoomStrings);
+
+		//convert roomType into an exhaustive array (ALL IN BETWEEN) of 1LDK, 2LDK etc
 
 		//do conditional calls based on waterfall and async
 		//you can still define all the other functions
@@ -52,13 +59,27 @@ module.exports = (app) => {
 
 
 
+		// var gpParts = createGPLink(gpWardNames, gpRmCode, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance)
+		// console.log('this is createGPLink', gpParts);
+
+		var gpLinks = [];
+
+		for(var j = 0; j < ward.length; j++){
+			var gpParts = createGPLink(ward[j], gpRmCode, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance)
+			var gpString = '';
+			for(var i = 0; i < gpParts.length; i++){
+				gpString += gpParts[i];
+			}
+			gpLinks.push(gpString);
+		}
+
+		console.log("this is gpLinks", gpLinks);
+
+		console.log("this is apamanString", apamanString);
 
 
-
-
-		console.log("this is roomType before create Link", roomType);
-		var apamanParts = createApamanLink(ward, roomType, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance)
-		console.log("this is createLink", apamanParts);
+		var apamanParts = createApamanLink(apamanWardNames, apamanRmCode, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance)
+		console.log("this is createApamanLink", apamanParts);
 
 		var apamanString = '';
 
@@ -72,24 +93,120 @@ module.exports = (app) => {
 
 
 
+		console.log("this is gpLinks", gpLinks[0]);
+
+		var testGP = 'https://apartments.gaijinpot.com/en/rent/listing?prefecture=JP-13&city=tokyo&min_price=30000&max_price=1000000&rooms=4&distance_station=20&building_type=mansion-apartment&building_age=0';
+		var testGP2 = 'https://apartments.gaijinpot.com/en/rent/listing?prefecture=JP-13&city=adachi&rooms=4&min_price=0&max_price=9999999&min_meter=0&building_age=0&distance_station=0&building_type=mansion-apartment';
+		var testGP3 = 'https://apartments.gaijinpot.com/en/rent/listing?prefecture=JP-13&city=tokyo&rooms=4&building_type=mansion-apartment&building_age=0';
+
+		getGPPageNumber();
 
 
 
-		async.waterfall([
-			getPageNumber,
-			getApamanData
-		], (err, result) => {
 
-			result.sort(function(a, b) {
-		    	return a.averagePrice - b.averagePrice;
+		
+
+		function gpWaterfallSingle() {
+			async.waterfall([
+				getGPPageNumber,
+				getGPData
+			], (err, result) => {
+
+				result.sort(function(a, b) {
+			    	return a.averagePrice - b.averagePrice;
+				});
+
+				console.log(result)
+				res.send(result);
+				
 			});
+		}
 
-			console.log(result)
-			res.send(result);
-			
-		});
+		
 
-		function getPageNumber(callback){
+		//put in gpLinks
+		function getGPPageNumber(){
+			request(testGP2, (err, res, html) => {
+				if(!err){
+					$ = cheerio.load(html);
+
+					var searchPageBottom = ($('.paginator'));
+					var numberPages;
+
+					searchPageBottom.each(function() {
+						numberPages = $(this).find('.pagination-last').find($('a')).attr('href');
+					});
+
+					if(numberPages === undefined) {
+						numberPages = 1;
+					}
+
+					console.log("this is the number of pages", numberPages);
+
+
+					// create page links
+					var gpPages = '';
+					var gpLinks = [];
+
+					//create unique links
+
+					var gpParts = createGPLink(ward[j], gpRmCode, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance)
+
+					for(var i = 1; i <= 1; i++){
+						var j = 0;
+						while(j < gpParts.length){
+							if(j === 1){
+								gpPages = gpPages + gpParts[j] + `?page=${i}`;
+							}
+
+							else if(j !== 1 && j !== apamanParts.length - 1) {
+								apamanPages += apamanParts[j];
+							}
+
+							j++;
+						}
+
+						gpLinks.push(apamanPages);
+						gpPages = '';
+					}
+
+					console.log(gpLinks);
+
+
+					//make async calls
+					// callback(null, apamanLinks);
+					
+				}
+			});
+		} 
+
+
+
+
+
+
+
+
+		function apamanWaterfallSingle() {
+			async.waterfall([
+				getApamanPageNumber,
+				getApamanData
+			], (err, result) => {
+
+				result.sort(function(a, b) {
+			    	return a.averagePrice - b.averagePrice;
+				});
+
+				console.log(result)
+				res.send(result);
+				
+			});
+		}
+
+		// apamanWaterfallSingle();
+		
+
+		function getApamanPageNumber(callback){
 			request(apamanString, (err, res, html) => {
 				if(!err){
 					$ = cheerio.load(html);

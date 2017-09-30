@@ -1,8 +1,7 @@
-const { conversionToString, conversionToRoom } = require('./data');
+const { conversionToGPCode, conversionToApamanCode, conversionToApamanCity } = require('./data');
 
 const createApamanLink = (ward, roomType, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance) => {
 
-	console.log("create link VERY BEGINNING", roomType)
 	var wardFormat = '';
 	var roomTypeFormat = '';
 
@@ -78,63 +77,103 @@ const createApamanLink = (ward, roomType, lowPrice, highPrice, lowerRoom, higher
 	return dataArray;
 }
 
-const calculateRoomTypeGP = (val) => {
+const createGPLink = (ward, roomType, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance) => {
 
-	var lowestString;
+	var wardFormat = '';
+	var roomTypeFormat = '';
+
+
+
+	var roomType = roomType.sort(function(a, b){return a - b});
+
+	wardFormat = ward
+	roomTypeFormat = roomType[0];
+
+	var apamanLinkParts = {
+						city: 'https://apartments.gaijinpot.com/en/rent/listing?',
+						prefecture: '&prefecture=JP-13',
+						ward: `&city=${wardFormat}`,
+						roomType: `&rooms=${roomTypeFormat}`,
+						prices: `&min_price=${lowPrice}&max_price=${highPrice}`,
+						roomSpace: `&min_meter=${lowerRoom}`,
+						yearsOld: `&building_age=${age}`,
+						walkingDistance: `&distance_station=${distance}`,
+						roomPlan: '&building_type=mansion-apartment',
+						depositMoney: '&no_deposit=1',
+						keyMoney: '&no_key_money=1'
+					 };
+
+	var dataArray = [];
+
+	console.log("this is deposit", deposit);
+	console.log("this is key", key);
+
+	if(deposit === 'true' && key == 'true'){
+		for(var o in apamanLinkParts){
+			dataArray.push(apamanLinkParts[o]);
+		}
+	}
+
+	else if(deposit === 'true' && key == 'false'){
+		delete apamanLinkParts.depositMoney;
+		for(var o in apamanLinkParts){
+			dataArray.push(apamanLinkParts[o]);
+		}
+	}
+
+	else if(deposit === 'false' && key == 'true'){
+		delete apamanLinkParts.keyMoney;
+		for(var o in apamanLinkParts){
+			dataArray.push(apamanLinkParts[o]);
+		}
+	}
+
+	else if(deposit === 'false' && key == 'false'){
+		delete apamanLinkParts.depositMoney;
+		delete apamanLinkParts.keyMoney;
+		for(var o in apamanLinkParts){
+			dataArray.push(apamanLinkParts[o]);
+		}
+	}
+	
+	return dataArray;
+}
+
+const gpRoomCode = (value) => {
+
+	var tempArray = value;
 	var roomCode;
-	var tempArray = val;
-	var smallestVal;
+
 	tempArray = tempArray.sort((a, b) => {
 		return b - a
 	});
 
-	//smallestVal is a string
-	smallestVal = Number(tempArray[0]);
-
-	lowestString = conversionToString(smallestVal);
-	roomCode = conversionToRoom(lowestString)
-
-
-	console.log("roomCode", roomCode);
+	roomCode = conversionToGPCode(tempArray);
 
 	return roomCode;
 }
 
-const roomsList = (val) => {
+const apamanCity = (value) => {
+	var tempArray = value;
+	var city;
 
-	var data = [
-		{size: '1R', code: 10},
-		{size: '1K', code: 11},
-		{size: '1DK', code: 12},
-		{size: '1LDK', code: 14},
-		{size: '2K', code: 21},
-		{size: '2DK', code: 22},
-		{size: '2LDK', code: 24},
-		{size: '3K', code: 31},
-		{size: '3DK', code: 32},
-		{size: '3LDK', code: 34},
-		{size: '4K', code: 41},
-		{size: '4DK', code: 42},
-		{size: '4LDK', code: 44},
-		{size: '5K+', code: 51}
-	]
+	tempArray = tempArray.sort((a, b) => {
+		return b - a
+	});
 
-	var temp = val;
-	var list = [];
+	city = conversionToApamanCity(tempArray);
 
-	for(var i = 0; i < temp.length; i++){
-		for(var j = 0; j < data.length; j++){
-			if(Number(temp[i]) === data[j].code){
-				list.push(data[j].size);
-			}
-		}
-	}
+	return city;
+}
 
-	return list;
+const apamanRoomCode = (value) => {
+	return conversionToApamanCode(value);
 }
 
 module.exports = {
+	createGPLink,
+	gpRoomCode,
 	createApamanLink,
-	calculateRoomTypeGP,
-	roomsList
+	apamanCity,
+	apamanRoomCode
 }
