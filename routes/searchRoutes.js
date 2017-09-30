@@ -99,34 +99,53 @@ module.exports = (app) => {
 		var testGP2 = 'https://apartments.gaijinpot.com/en/rent/listing?prefecture=JP-13&city=adachi&rooms=4&min_price=0&max_price=9999999&min_meter=0&building_age=0&distance_station=0&building_type=mansion-apartment';
 		var testGP3 = 'https://apartments.gaijinpot.com/en/rent/listing?prefecture=JP-13&city=tokyo&rooms=4&building_type=mansion-apartment&building_age=0';
 
-		getGPPageNumber();
+
+		//gpLinks is an array of links
+		// getGPPageNumber(gpLinks);
 
 
 
 
-		
-
-		function gpWaterfallSingle() {
+		async.each(gpLinks, (link, next) => {
 			async.waterfall([
-				getGPPageNumber,
-				getGPData
-			], (err, result) => {
-
-				result.sort(function(a, b) {
-			    	return a.averagePrice - b.averagePrice;
-				});
-
+				async.apply(getGPPageNumber, link),
+				getGPData,
+				next
+			]), (err, result) => {
 				console.log(result)
-				res.send(result);
-				
-			});
-		}
+			}
+		}, (err, result) => {
+			if(err) {
+				return err;
+			}
 
+		});
+
+
+		// function gpWaterfallSingle() {
+		// 	async.waterfall([
+		// 		getGPPageNumber,
+		// 		getGPData
+		// 	], (err, result) => {
+
+		// 		result.sort(function(a, b) {
+		// 	    	return a.averagePrice - b.averagePrice;
+		// 		});
+
+		// 		console.log(result)
+		// 		res.send(result);
+				
+		// 	});
+		// }
 		
+
 
 		//put in gpLinks
-		function getGPPageNumber(){
-			request(testGP2, (err, res, html) => {
+		function getGPPageNumber(link, callback){
+			console.log("this is the link used", link);
+			//use regex to find the ward here
+
+			request(link, (err, res, html) => {
 				if(!err){
 					$ = cheerio.load(html);
 
@@ -137,6 +156,8 @@ module.exports = (app) => {
 						numberPages = $(this).find('.pagination-last').find($('a')).attr('href');
 					});
 
+					console.log("hello");
+
 					if(numberPages === undefined) {
 						numberPages = 1;
 					}
@@ -146,39 +167,98 @@ module.exports = (app) => {
 
 					// create page links
 					var gpPages = '';
-					var gpLinks = [];
+					var gpPageLinks = [];
+					var ward = link.match(/city=(.*)/)[1].replace(/&.*$/,"");;
+
+					console.log("this is ward inside getGPPageNumber", ward);
 
 					//create unique links
 
-					var gpParts = createGPLink(ward[j], gpRmCode, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance)
+					//this is the problem here ward[0]
+					var gpParts = createGPLink(ward, gpRmCode, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance)
 
 					for(var i = 1; i <= 1; i++){
 						var j = 0;
 						while(j < gpParts.length){
-							if(j === 1){
+							if(j === 0){
 								gpPages = gpPages + gpParts[j] + `?page=${i}`;
 							}
 
-							else if(j !== 1 && j !== apamanParts.length - 1) {
-								apamanPages += apamanParts[j];
+							else if(j !== 0 && j !== gpParts.length - 1) {
+								gpPages += gpParts[j];
 							}
 
 							j++;
 						}
 
-						gpLinks.push(apamanPages);
+						gpPageLinks.push(gpPages);
 						gpPages = '';
 					}
 
-					console.log(gpLinks);
-
+					console.log("this is gpPageLinks", gpPageLinks);
 
 					//make async calls
-					// callback(null, apamanLinks);
+					callback(null, gpPageLinks);
 					
 				}
 			});
-		} 
+		}
+
+
+		function getGPData(links, callback){
+			//createLink
+			//do pageData here
+			console.log('these are links in getGPData', links);
+
+			var array = [];
+			var count = 0;
+			var linksLength = links.length;
+			//make next a callback
+			async.whilst(
+				function() { 
+					return count < linksLength; 
+				},
+				function(cb){
+					var link = links[count];
+					request(link, (err, res, html) => {
+						if(!err){
+							$ = cheerio.load(html);
+
+							var overallBox = $('.mod_box_section_bdt');
+
+							overallBox.each(function() {
+								array.push({
+									buildingName: $(this).find($('.name')).text(),
+									link: 'http://www.apamanshop.com/' + $(this).find($('.box_head_result')).find($('a')).attr('href'),
+									location: $(this).find($('.address')).text(),
+									trainStation: formatApamanTrains($(this).find($('.list_info')).find($('li')).text()),
+									priceRange: $(this).find($('.info')).find($('.price')).text(),
+									averagePrice: averageApaman($(this).find($('.info')).find($('.price')).text()),
+									propertiesAvailable: $(this).find($('tbody')).find($('tr')).length-$(this).find($('tbody')).find($('.tr_under')).length-1,
+									roomType: $(this).find($('tbody')).find($('.list_icn_room')).parent().next().next().next().children().first().text(),
+									roomSize: $(this).find($('tbody')).find($('.list_icn_room')).parent().next().next().next().children().first().next().text(),
+									api: 'apaman'
+								});
+							});
+
+							count++;
+							cb();
+						}
+					});
+				}, function(err) {
+					if(err) {
+						return err;
+					}
+
+					else {
+						// console.log('this is outside of async.each', array);
+						callback(null, array);
+				    }
+				});
+		}
+
+
+
 
 
 
@@ -303,7 +383,6 @@ module.exports = (app) => {
 						callback(null, array);
 				    }
 				});
-			
 		}
 
 		function averageApaman(text) {

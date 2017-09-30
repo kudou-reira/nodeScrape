@@ -90,7 +90,7 @@ const createGPLink = (ward, roomType, lowPrice, highPrice, lowerRoom, higherRoom
 	roomTypeFormat = roomType[0];
 
 	var apamanLinkParts = {
-						city: 'https://apartments.gaijinpot.com/en/rent/listing?',
+						city: 'https://apartments.gaijinpot.com/en/rent/listing',
 						prefecture: '&prefecture=JP-13',
 						ward: `&city=${wardFormat}`,
 						roomType: `&rooms=${roomTypeFormat}`,
