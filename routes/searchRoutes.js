@@ -3,6 +3,7 @@ const cheerio = require('cheerio');
 const request = require('request');
 const rp = require('request-promise');
 const async = require('async');
+const _ = require('lodash');
 const { createGPLink, gpRoomCode, createApamanLink, apamanCity, apamanRoomCode } = require('../helperFunctions/handleParams');
 
 module.exports = (app) => {
@@ -138,20 +139,20 @@ module.exports = (app) => {
 			], (err, result) => {
 
 				console.log('processed ');
-				// gpLinksCount--;
+				gpLinksCount--;
 				// console.log('count', gpLinksCount);
 				rawData.push(result);
-				console.log("this is waterfall gaijinpot", rawData);
+				// console.log("this is waterfall gaijinpot", rawData);
 				var temp = rawData;
 
 
-				//when count is 0, do the callback
-				// if(rawData.length === gpLinksCount) {
-				// 	console.log("calling callback");
-					
-				// }
+				// when count is 0, do the callback
+				if(gpLinksCount === 0) {
+					console.log("calling callback");
+					callback(rawData);
+				}
 
-				callback(rawData);
+				
 				
 			})
 		}, (result) => {
@@ -159,7 +160,9 @@ module.exports = (app) => {
 			console.log('all links processed :D');
 			console.log('all links processed :D');
 			console.log('all links processed :D');
-			console.log('this is the result', result);
+
+			var temp = _.flatten(result);
+			console.log('this is the result', temp);
 
 		});
 
@@ -340,7 +343,7 @@ module.exports = (app) => {
 					}
 
 					else {
-						console.log('this is outside of async.each', array);
+						// console.log('this is outside of async.each', array);
 						callback(null, array);
 						// console.log('this is outside/after of async.each', array)
 				    }
