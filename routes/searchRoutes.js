@@ -131,59 +131,61 @@ module.exports = (app) => {
 		let rawData = [];
 		var count = 0;
 		var gpLinksCount = gpLinks.length;
+
+
 		//main
-		async.each(gpLinks, (link, callback) => {
-			async.waterfall([
-				async.apply(getGPPageNumber, link),
-				getGPData
+
+		// gpScrape((null, result) => {
+		// 	console.log('this is from gpScrape callback', result);
+		// });
+
+		function combineApi(callback) {
+			async.parallel([
+				gpScrape,
+				apamanScrape
 			], (err, result) => {
+				console.log('this is from inside combine API', result);
+				callback(err, result);
+			});
+		}
 
-				console.log('processed ');
-				gpLinksCount--;
-				// console.log('count', gpLinksCount);
-				rawData.push(result);
-				// console.log("this is waterfall gaijinpot", rawData);
-				var temp = rawData;
-
-
-				// when count is 0, do the callback
-				if(gpLinksCount === 0) {
-					console.log("calling callback");
-					callback(rawData);
-				}
-
-				
-				
-			})
-		}, (result) => {
-
-			console.log('all links processed :D');
-			console.log('all links processed :D');
-			console.log('all links processed :D');
-
-			var temp = _.flatten(result);
-			console.log('this is the result', temp);
-
+		combineApi((err, result) => {
+			console.log('this is combineApi', result);
 		});
-
-		//make the "next" callback a function that collects all the results from waterfall
-
-		// function gpWaterfallSingle() {
-		// 	async.waterfall([
-		// 		getGPPageNumber,
-		// 		getGPData
-		// 	], (err, result) => {
-
-		// 		result.sort(function(a, b) {
-		// 	    	return a.averagePrice - b.averagePrice;
-		// 		});
-
-		// 		console.log(result)
-		// 		res.send(result);
-				
-		// 	});
-		// }
 		
+
+		function gpScrape(callback) {
+			async.each(gpLinks, (link, callback) => {
+				async.waterfall([
+					async.apply(getGPPageNumber, link),
+					getGPData
+				], (err, result) => {
+
+					console.log('processed ');
+					gpLinksCount--;
+					// console.log('count', gpLinksCount);
+					rawData.push(result);
+					// console.log("this is waterfall gaijinpot", rawData);
+					var temp = rawData;
+
+					// when count is 0, do the callback
+					if(gpLinksCount === 0) {
+						console.log("calling callback");
+						callback(rawData);
+					}
+					
+				})
+			}, (result) => {
+
+				console.log('all links processed :D');
+				console.log('all links processed :D');
+				console.log('all links processed :D');
+
+				var temp = _.flatten(result);
+				console.log('this is the result', temp);
+				callback(null, temp);
+			});
+		}
 
 
 		//put in gpLinks
@@ -279,15 +281,15 @@ module.exports = (app) => {
 								var apartmentObject = {};
 
 								var apartmentObject = {
-									buildingName: formatBuildingName($(this).find($('.text-xsmall')).first().text()),
+									buildingName: formatGPBuildingName($(this).find($('.text-xsmall')).first().text()),
 									link: buildingLink,
-									location: formatLocation($(this).find($('.listing-title')).children().last().html()),
-									trainStation: formatTrainStation($(this).find($('.listing-right-col')).children().last().children().text()),
-									priceRange: formatPrice($(this).find($('.listing-title')).next().text()),
-									averagePrice: Number(formatPrice($(this).find($('.listing-title')).next().text())),
+									location: formatGPLocation($(this).find($('.listing-title')).children().last().html()),
+									trainStation: formatGPTrainStation($(this).find($('.listing-right-col')).children().last().children().text()),
+									priceRange: formatGPPrice($(this).find($('.listing-title')).next().text()),
+									averagePrice: Number(formatGPPrice($(this).find($('.listing-title')).next().text())),
 									propertiesAvailable: 1,
-									roomType: formatRoomType($(this).find($('.listing-title')).children().children().text()),
-									roomSize: formatRoomSize($(this).find($('.listing-title')).next().next().text()),
+									roomType: formatGPRoomType($(this).find($('.listing-title')).children().children().text()),
+									roomSize: formatGPRoomSize($(this).find($('.listing-title')).next().next().text()),
 									api: 'gaijinpot'
 								}
 
@@ -351,38 +353,38 @@ module.exports = (app) => {
 		}
 
 
-		function formatPrice(number) {
+		function formatGPPrice(number) {
 			var newText = number;
 			newText = newText.replace(/\t+/g, "").replace(/\s/g,'').replace('MonthlyCosts', '').replace("\n"," ").replace('¥', '').replace(',', '');
 			return newText;
 		}
 
-		function formatRoomType(room) {
+		function formatGPRoomType(room) {
 			var newText = room;
 			newText = newText.replace(/\t+/g, "").replace(/\s/g,'').replace("\n"," ").replace('Apartment', '');
 			return newText;
 		}
 
-		function formatTrainStation(train) {
+		function formatGPTrainStation(train) {
 			var newText = train;
 			newText = newText.replace('Nearest Station', '');
 			newText = newText.replace(/Station/g, "Station ")
 			return newText;
 		}
 
-		function formatLocation(place) {
+		function formatGPLocation(place) {
 			var newText = place;
 			newText = newText.replace('in ', '').replace('<br>', ' ');
 			return newText;
 		}
 
-		function formatRoomSize(room) {
+		function formatGPRoomSize(room) {
 			var newText = room;
 			newText = newText.replace(/\t+/g, "").replace("\n"," ").replace('Size ', '').replace(' ', '');
 			return newText;
 		}
 
-		function formatBuildingName(building){
+		function formatGPBuildingName(building){
 			var newText = building;
 			newText = newText.replace(/\t+/g, "").replace("\n","").replace("\n","");
 			return newText;
@@ -396,23 +398,47 @@ module.exports = (app) => {
 
 
 
-		function apamanWaterfallSingle() {
+		// function apamanWaterfallSingle() {
+		// 	async.waterfall([
+		// 		getApamanPageNumber,
+		// 		getApamanData
+		// 	], (err, result) => {
+
+		// 		result.sort(function(a, b) {
+		// 	    	return a.averagePrice - b.averagePrice;
+		// 		});
+
+		// 		console.log(result)
+		// 		res.send(result);
+				
+		// 	});
+		// }
+
+		// apamanWaterfallSingle();
+
+
+
+		// apamanScrape((err, result) => {
+		// 	console.log("this is apaman scrape", result)
+		// });
+
+		function apamanScrape(callback) {
 			async.waterfall([
 				getApamanPageNumber,
 				getApamanData
 			], (err, result) => {
 
-				result.sort(function(a, b) {
-			    	return a.averagePrice - b.averagePrice;
-				});
+				// result.sort(function(a, b) {
+			 //    	return a.averagePrice - b.averagePrice;
+				// });
 
-				console.log(result)
-				res.send(result);
+				callback(null, result)
+				// res.send(result);
 				
 			});
 		}
 
-		// apamanWaterfallSingle();
+
 		
 
 		function getApamanPageNumber(callback){
