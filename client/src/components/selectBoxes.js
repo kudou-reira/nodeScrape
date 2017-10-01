@@ -44,7 +44,13 @@ class SelectBoxes extends Component {
 			keyMoney: false,
 			priceError: false,
 			areaError: false,
-			submitted: false
+			submitted: false,
+			apamanLabel: {value: 'apaman', label: 'Apaman'},
+			gpLabel: {value: 'gaijinpot', label: 'Gaijin Pot'},
+			options: [
+				{value: 'apaman', label: 'Apaman'},
+				{value: 'gaijinpot', label: 'Gaijin Pot'}
+			]
 		}
 	}
 
@@ -223,7 +229,16 @@ class SelectBoxes extends Component {
 
 		if(!array.includes(checkedValue)){
 			array.push(checkedValue);
-			this.setState({ apiToUse: array }, () => console.log(this.state.apiToUse));
+			this.setState({ apiToUse: array }, () => {
+				console.log(this.state.apiToUse);
+				var tempOptions = this.updateOptions();
+				console.log('these are tempOptions', tempOptions);
+				this.setState({ options: tempOptions });
+			});
+				
+
+			//add options here
+			
 		}
 
 		else{
@@ -231,8 +246,31 @@ class SelectBoxes extends Component {
 				return val === checkedValue;
 			});
 
-			this.setState({ apiToUse: array }, () => console.log(this.state.apiToUse));
+			this.setState({ apiToUse: array }, () => {
+				console.log(this.state.apiToUse);
+				var tempOptions = this.updateOptions();
+				console.log('these are tempOptions', tempOptions);
+				this.setState({ options: tempOptions });
+			})
+			
 		}
+	}
+
+	updateOptions(){
+		var newOptions = [];
+		var temp = this.state.apiToUse;
+
+		for(var i = 0; i < temp.length;  i++){
+			if(temp[i] === 'apaman'){
+				newOptions.push(this.state.apamanLabel);
+			}
+
+			else if(temp[i] === 'gaijinpot'){
+				newOptions.push(this.state.gpLabel);
+			}
+		}
+
+		return newOptions;
 	}
 
 	handleRoomClick(e) {
@@ -370,7 +408,7 @@ class SelectBoxes extends Component {
 			    <div className="spaceTop">
 					<div>
 						<div className="formatInner">
-							<h3>Api(s) to Use</h3>
+							<h3>Websites to Use</h3>
 							<ButtonToolbar>
 								<ToggleButtonGroup type="checkbox" defaultValue={['apaman', 'gaijinpot']}>
 									{this.renderApi()}
@@ -482,7 +520,7 @@ class SelectBoxes extends Component {
 						Submit
 				    </Button>
 			    </div>
-			    <CardsModal results={this.props.results} />
+			    <CardsModal results={this.props.results} options={this.state.options} filter={this.state.apiToUse} />
 			    {console.log('these are results', this.props.results)}
 
 		    </div>

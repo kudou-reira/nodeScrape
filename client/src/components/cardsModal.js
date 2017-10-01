@@ -27,8 +27,8 @@ class CardsModal extends Component {
 			sortPlaceHolder: 'Ascending Price',
 			stayOpen: false,
 			disabled: false,
-			apiToUse: 'apaman,gaijinpot',
-			sortParam: 'low'
+			apiToUse: '',
+			sortVal: 'low'
 		}
 
 		this.closeModal = this.closeModal.bind(this);
@@ -40,10 +40,15 @@ class CardsModal extends Component {
 
 	componentWillReceiveProps(nextProps){
 		if(nextProps.results !== this.props.results){
+
 			this.setState({ pageCount: Math.ceil(nextProps.results.length/this.state.paginationIntervals) }, () => {
 				console.log("pageCount in receive props", this.state.pageCount);
 			});
 		}
+
+		var tempFilter = nextProps.filter;
+		var stringFilter = tempFilter.join();
+		this.setState({ apiToUse: stringFilter });
 	}
 
 	closeModal() {
@@ -114,6 +119,10 @@ class CardsModal extends Component {
     	if(this.props.results !== null){
 
     		var tempResults = this.props.results;
+    		console.log("rendersinglecard", tempResults);
+    		var sorting = this.sortResults(tempResults);
+    		console.log('sorting', sorting);
+
 	    	var chunkedResults = this.assignPaginationValues(tempResults);
 
 	    	var chunkedSelectedPage = this.selectedPage(chunkedResults);
@@ -149,7 +158,7 @@ class CardsModal extends Component {
     }
 
     renderCardButton(data){
-    	if(data.averagePrice < 10) {
+    	if(data.averagePrice <= 10) {
     		return(
     			<h2><Button className="cardButton1"><a href={data.link} target="_blank">More information</a></Button></h2>
     		);
@@ -235,16 +244,12 @@ class CardsModal extends Component {
 
     apiChoicesChange(val){
     	this.setState({ apiToUse: val }, () => {
-    		console.log(this.state.apiToUse);
-    		console.log("this is type of", typeof this.state.apiToUse);
+    		console.log('api to use', this.state.apiToUse);
     	});
     }
 
     renderApiChoices(){
-    	var options = [
-    					{value: 'apaman', label: 'Apaman'},
-    					{value: 'gaijinpot', label: 'Gaijin Pot'}
-    				  ];
+    	var options = this.props.options;
 
     	return(
     		<div className="api">
@@ -265,10 +270,29 @@ class CardsModal extends Component {
     }
 
     sortChange(val){
-    	this.setState({ sortVal: val }, () => {
-    		console.log(this.state.sortVal);
-    		console.log("this is type of", typeof this.state.apiToUse);
+    	this.setState({ sortVal: val.value }, () => {
+    		console.log("this is the new sort val", this.state.sortVal);
     	});
+    }
+
+    sortResults(data){
+    	if(this.state.sortVal === 'low'){
+    		var temp = data;
+    		temp.sort(function(a, b) {
+		    	return a.averagePrice - b.averagePrice;
+			});
+
+			return temp;
+    	}
+
+    	else if(this.state.sortVal === 'high'){
+    		var temp = data;
+    		temp.sort(function(a, b) {
+		    	return b.averagePrice - a.averagePrice;
+			});
+
+			return temp;
+    	}
     }
 
     renderSort() {
@@ -292,6 +316,9 @@ class CardsModal extends Component {
     }
 
 	render(){
+		{console.log('this is props filter', this.props.filter)}
+		{console.log('this is props options', this.props.options)}
+		{console.log('this is state apiToUse', this.state.apiToUse)}
 		return(
 			<ButtonToolbar>
 		        <Modal

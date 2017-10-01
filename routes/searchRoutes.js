@@ -37,8 +37,6 @@ module.exports = (app) => {
 		var apamanWardNames = apamanCity(ward);
 		console.log("this is apamanCity", apamanWardNames);
 
-
-
 		console.log("this is api", api);
 
 		// console.log("this is the list of rooms", listOfRoomStrings);
@@ -48,18 +46,6 @@ module.exports = (app) => {
 		//do conditional calls based on waterfall and async
 		//you can still define all the other functions
 		
-
-
-
-
-
-
-
-
-
-
-
-
 
 		// var gpParts = createGPLink(gpWardNames, gpRmCode, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance)
 		// console.log('this is createGPLink', gpParts);
@@ -76,8 +62,8 @@ module.exports = (app) => {
 		}
 
 		console.log("this is gpLinks", gpLinks);
-
 		console.log("this is apamanString", apamanString);
+
 
 
 		var apamanParts = createApamanLink(apamanWardNames, apamanRmCode, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance)
@@ -94,67 +80,13 @@ module.exports = (app) => {
 
 
 
-
-		console.log("this is gpLinks", gpLinks[0]);
-
-		var testGP = 'https://apartments.gaijinpot.com/en/rent/listing?prefecture=JP-13&city=tokyo&min_price=30000&max_price=1000000&rooms=4&distance_station=20&building_type=mansion-apartment&building_age=0';
-		var testGP2 = 'https://apartments.gaijinpot.com/en/rent/listing?prefecture=JP-13&city=adachi&rooms=4&min_price=0&max_price=9999999&min_meter=0&building_age=0&distance_station=0&building_type=mansion-apartment';
-		var testGP3 = 'https://apartments.gaijinpot.com/en/rent/listing?prefecture=JP-13&city=tokyo&rooms=4&building_type=mansion-apartment&building_age=0';
-
-
-		//gpLinks is an array of links
-		// getGPPageNumber(gpLinks);
-
-
-		
-
-
-		// async.each(gpLinks, (link) => {
-
-		// 	search(link);
-			
-		// }, (err, result) => {
-		// 	if(err) {
-		// 		return err;
-		// 	}
-		// 	console.log('HIHIHIHIHIHIHI');
-		// });
-
-		// function search(link, callback) {
-		// 	async.waterfall([
-		// 		async.apply(getGPPageNumber, link),
-		// 		getGPData
-		// 	], callback);
-		// }
-
-
+		//main
+		//declare functions as variables to be passed into async parallel
 		let rawData = [];
 		var count = 0;
 		var gpLinksCount = gpLinks.length;
 
-
-		//main
-
-		// gpScrape((null, result) => {
-		// 	console.log('this is from gpScrape callback', result);
-		// });
-
-		function combineApi(callback) {
-			async.parallel([
-				gpScrape,
-				apamanScrape
-			], (err, result) => {
-				console.log('this is from inside combine API', result);
-				callback(err, result);
-			});
-		}
-
-		combineApi((err, result) => {
-			console.log('this is combineApi', result);
-		});
-		
-
-		function gpScrape(callback) {
+		var gpOverall = function gpScrape(callback) {
 			async.each(gpLinks, (link, callback) => {
 				async.waterfall([
 					async.apply(getGPPageNumber, link),
@@ -186,6 +118,73 @@ module.exports = (app) => {
 				callback(null, temp);
 			});
 		}
+
+
+		var apamanOverall = function apamanScrape(callback) {
+			async.waterfall([
+				getApamanPageNumber,
+				getApamanData
+			], (err, result) => {
+				callback(null, result)
+			});
+		}
+
+
+
+		var apiStack = [];
+
+		var apiAssign = {
+			apaman: apamanOverall,
+			gaijinpot: gpOverall
+		};
+
+
+		for(var i = 0; i < api.length; i++){
+			apiStack.push(apiAssign[api[i]]);
+		}
+
+		console.log("this is apaman stack", apiStack);
+
+		combineApi((err, result) => {
+			var temp = _.flatten(result);
+			temp.sort(function(a, b) {
+		    	return a.averagePrice - b.averagePrice;
+			});
+			console.log('this is combineApi', temp);
+
+			res.send(temp);
+		});
+
+
+
+		function combineApi(callback) {
+			async.parallel(apiStack, (err, result) => {
+				callback(err, result);
+			});
+		}
+
+
+		// function combineApi(stack, callback) {
+		// 	async.parallel([
+		// 		gpScrape,
+		// 		apamanScrape
+		// 	], (err, result) => {
+		// 		console.log('this is from inside combine API', result);
+		// 		callback(err, result);
+		// 	});
+		// }
+
+
+
+
+
+
+
+
+		// gpScrape((null, result) => {
+		// 	console.log('this is from gpScrape callback', result);
+		// });
+
 
 
 		//put in gpLinks
@@ -284,9 +283,9 @@ module.exports = (app) => {
 									buildingName: formatGPBuildingName($(this).find($('.text-xsmall')).first().text()),
 									link: buildingLink,
 									location: formatGPLocation($(this).find($('.listing-title')).children().last().html()),
-									trainStation: formatGPTrainStation($(this).find($('.listing-right-col')).children().last().children().text()),
-									priceRange: formatGPPrice($(this).find($('.listing-title')).next().text()),
-									averagePrice: Number(formatGPPrice($(this).find($('.listing-title')).next().text())),
+									trainStation: [formatGPTrainStation($(this).find($('.listing-right-col')).children().last().children().text())],
+									priceRange: formatGPYen(formatGPPrice($(this).find($('.listing-title')).next().text())),
+									averagePrice: formatGPPrice($(this).find($('.listing-title')).next().text()),
 									propertiesAvailable: 1,
 									roomType: formatGPRoomType($(this).find($('.listing-title')).children().children().text()),
 									roomSize: formatGPRoomSize($(this).find($('.listing-title')).next().next().text()),
@@ -356,7 +355,22 @@ module.exports = (app) => {
 		function formatGPPrice(number) {
 			var newText = number;
 			newText = newText.replace(/\t+/g, "").replace(/\s/g,'').replace('MonthlyCosts', '').replace("\n"," ").replace('¥', '').replace(',', '');
-			return newText;
+			var newNumber = Number(newText)/10000;
+			var decimalPoints = countDecimals(newNumber);
+
+			if(decimalPoints > 1){
+				return newNumber.toFixed(2);
+			}
+
+			else{
+				return newNumber;
+			}
+		}
+
+		function formatGPYen(number){
+			var temp = number.toString();
+			temp = temp + '万円';
+			return temp;
 		}
 
 		function formatGPRoomType(room) {
@@ -392,54 +406,6 @@ module.exports = (app) => {
 
 
 
-
-
-
-
-
-
-		// function apamanWaterfallSingle() {
-		// 	async.waterfall([
-		// 		getApamanPageNumber,
-		// 		getApamanData
-		// 	], (err, result) => {
-
-		// 		result.sort(function(a, b) {
-		// 	    	return a.averagePrice - b.averagePrice;
-		// 		});
-
-		// 		console.log(result)
-		// 		res.send(result);
-				
-		// 	});
-		// }
-
-		// apamanWaterfallSingle();
-
-
-
-		// apamanScrape((err, result) => {
-		// 	console.log("this is apaman scrape", result)
-		// });
-
-		function apamanScrape(callback) {
-			async.waterfall([
-				getApamanPageNumber,
-				getApamanData
-			], (err, result) => {
-
-				// result.sort(function(a, b) {
-			 //    	return a.averagePrice - b.averagePrice;
-				// });
-
-				callback(null, result)
-				// res.send(result);
-				
-			});
-		}
-
-
-		
 
 		function getApamanPageNumber(callback){
 			request(apamanString, (err, res, html) => {
