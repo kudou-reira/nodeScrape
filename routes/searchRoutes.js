@@ -1,6 +1,7 @@
 const requireLogin = require('../middlewares/requireLogin');
 const cheerio = require('cheerio');
 const request = require('request');
+const rp = require('request-promise');
 const async = require('async');
 const { createGPLink, gpRoomCode, createApamanLink, apamanCity, apamanRoomCode } = require('../helperFunctions/handleParams');
 
@@ -104,23 +105,65 @@ module.exports = (app) => {
 		// getGPPageNumber(gpLinks);
 
 
+		
 
 
-		async.each(gpLinks, (link, next) => {
+		// async.each(gpLinks, (link) => {
+
+		// 	search(link);
+			
+		// }, (err, result) => {
+		// 	if(err) {
+		// 		return err;
+		// 	}
+		// 	console.log('HIHIHIHIHIHIHI');
+		// });
+
+		// function search(link, callback) {
+		// 	async.waterfall([
+		// 		async.apply(getGPPageNumber, link),
+		// 		getGPData
+		// 	], callback);
+		// }
+
+
+		let rawData = [];
+		var count = 0;
+		var gpLinksCount = gpLinks.length;
+		//main
+		async.each(gpLinks, (link, callback) => {
 			async.waterfall([
 				async.apply(getGPPageNumber, link),
-				getGPData,
-				next
-			]), (err, result) => {
-				console.log(result)
-			}
-		}, (err, result) => {
-			if(err) {
-				return err;
-			}
+				getGPData
+			], (err, result) => {
+
+				console.log('processed ');
+				// gpLinksCount--;
+				// console.log('count', gpLinksCount);
+				rawData.push(result);
+				console.log("this is waterfall gaijinpot", rawData);
+				var temp = rawData;
+
+
+				//when count is 0, do the callback
+				// if(rawData.length === gpLinksCount) {
+				// 	console.log("calling callback");
+					
+				// }
+
+				callback(rawData);
+				
+			})
+		}, (result) => {
+
+			console.log('all links processed :D');
+			console.log('all links processed :D');
+			console.log('all links processed :D');
+			console.log('this is the result', result);
 
 		});
 
+		//make the "next" callback a function that collects all the results from waterfall
 
 		// function gpWaterfallSingle() {
 		// 	async.waterfall([
@@ -168,7 +211,7 @@ module.exports = (app) => {
 					// create page links
 					var gpPages = '';
 					var gpPageLinks = [];
-					var ward = link.match(/city=(.*)/)[1].replace(/&.*$/,"");;
+					var ward = link.match(/city=(.*)/)[1].replace(/&.*$/, "");
 
 					console.log("this is ward inside getGPPageNumber", ward);
 
@@ -195,7 +238,6 @@ module.exports = (app) => {
 						gpPages = '';
 					}
 
-					console.log("this is gpPageLinks", gpPageLinks);
 
 					//make async calls
 					callback(null, gpPageLinks);
@@ -224,21 +266,68 @@ module.exports = (app) => {
 						if(!err){
 							$ = cheerio.load(html);
 
-							var overallBox = $('.mod_box_section_bdt');
+							var overallBox = $('.listing-body');
 
 							overallBox.each(function() {
-								array.push({
-									buildingName: $(this).find($('.name')).text(),
-									link: 'http://www.apamanshop.com/' + $(this).find($('.box_head_result')).find($('a')).attr('href'),
-									location: $(this).find($('.address')).text(),
-									trainStation: formatApamanTrains($(this).find($('.list_info')).find($('li')).text()),
-									priceRange: $(this).find($('.info')).find($('.price')).text(),
-									averagePrice: averageApaman($(this).find($('.info')).find($('.price')).text()),
-									propertiesAvailable: $(this).find($('tbody')).find($('tr')).length-$(this).find($('tbody')).find($('.tr_under')).length-1,
-									roomType: $(this).find($('tbody')).find($('.list_icn_room')).parent().next().next().next().children().first().text(),
-									roomSize: $(this).find($('tbody')).find($('.list_icn_room')).parent().next().next().next().children().first().next().text(),
-									api: 'apaman'
-								});
+								var findBuildingLink = $(this).find($('.listing-title')).find($('a')).attr('href');
+								var buildingLink = `https://apartments.gaijinpot.com${findBuildingLink}`;
+
+								// console.log("this is secondLinkToScrape", buildingLink);
+								var apartmentObject = {};
+
+								var apartmentObject = {
+									buildingName: formatBuildingName($(this).find($('.text-xsmall')).first().text()),
+									link: buildingLink,
+									location: formatLocation($(this).find($('.listing-title')).children().last().html()),
+									trainStation: formatTrainStation($(this).find($('.listing-right-col')).children().last().children().text()),
+									priceRange: formatPrice($(this).find($('.listing-title')).next().text()),
+									averagePrice: Number(formatPrice($(this).find($('.listing-title')).next().text())),
+									propertiesAvailable: 1,
+									roomType: formatRoomType($(this).find($('.listing-title')).children().children().text()),
+									roomSize: formatRoomSize($(this).find($('.listing-title')).next().next().text()),
+									api: 'gaijinpot'
+								}
+
+								//give up on this feature for now
+
+								// buildingName: $(this).find($('.name')).text(),
+
+								// var options = {
+								// 	uri: buildingLink,
+								// 	transform: (html) => {
+								// 		return cheerio.load(html);
+								// 	}
+								// };
+
+								// rp(options)
+								// 	.then(($) => {
+								// 		var overallBox = $('.dl-horizontal-border');
+
+								// 		var buildingName = '';
+
+								// 		console.log('test', $(this).find('dd').text());
+
+								// 		// overallBox.each((i, element) => {
+								// 		// 	$(element).contents().each((i, element) => {
+								// 		// 		if(element.type === 'text'){
+								// 		// 			console.log($(element));
+								// 		// 		}
+								// 		// 	});
+								// 		// });
+
+								// 		// console.log("this is building name", buildingName);
+
+								// 	})
+								// 	.catch((err) => {
+								// 		console.log('cheerio crawling failed', err);
+								// 	});
+
+
+
+								array.push(apartmentObject);
+
+
+								//do the second request here
 							});
 
 							count++;
@@ -251,13 +340,50 @@ module.exports = (app) => {
 					}
 
 					else {
-						// console.log('this is outside of async.each', array);
+						console.log('this is outside of async.each', array);
 						callback(null, array);
+						// console.log('this is outside/after of async.each', array)
 				    }
 				});
 		}
 
 
+		function formatPrice(number) {
+			var newText = number;
+			newText = newText.replace(/\t+/g, "").replace(/\s/g,'').replace('MonthlyCosts', '').replace("\n"," ").replace('¥', '').replace(',', '');
+			return newText;
+		}
+
+		function formatRoomType(room) {
+			var newText = room;
+			newText = newText.replace(/\t+/g, "").replace(/\s/g,'').replace("\n"," ").replace('Apartment', '');
+			return newText;
+		}
+
+		function formatTrainStation(train) {
+			var newText = train;
+			newText = newText.replace('Nearest Station', '');
+			newText = newText.replace(/Station/g, "Station ")
+			return newText;
+		}
+
+		function formatLocation(place) {
+			var newText = place;
+			newText = newText.replace('in ', '').replace('<br>', ' ');
+			return newText;
+		}
+
+		function formatRoomSize(room) {
+			var newText = room;
+			newText = newText.replace(/\t+/g, "").replace("\n"," ").replace('Size ', '').replace(' ', '');
+			return newText;
+		}
+
+		function formatBuildingName(building){
+			var newText = building;
+			newText = newText.replace(/\t+/g, "").replace("\n","").replace("\n","");
+			return newText;
+		}
 
 
 
