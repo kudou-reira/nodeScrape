@@ -120,11 +120,14 @@ class CardsModal extends Component {
 
     		var tempResults = this.props.results;
     		console.log("rendersinglecard", tempResults);
-    		var sorting = this.sortResults(tempResults);
+
+    		var filter = this.filterApi(tempResults);
+    		console.log("this is filter in card", filter);
+    		var sorting = this.sortResults(filter);
     		console.log('sorting', sorting);
 
-	    	var chunkedResults = this.assignPaginationValues(tempResults);
 
+	    	var chunkedResults = this.assignPaginationValues(sorting);
 	    	var chunkedSelectedPage = this.selectedPage(chunkedResults);
 
 	    	console.log("this is renderSingleCard in modal", this.props.auth);
@@ -244,7 +247,30 @@ class CardsModal extends Component {
 
     apiChoicesChange(val){
     	this.setState({ apiToUse: val }, () => {
-    		console.log('api to use', this.state.apiToUse);
+
+    		console.log('api to use in apiChoicesChange', this.state.apiToUse);
+
+    		var tempApi = this.state.apiToUse;
+	    	tempApi = tempApi.split(',');
+
+	    	console.log("this is tempapi in apiChoicesChange", tempApi);
+
+	    	var tempFilter = [];
+	    	var finalFilter = [];
+
+	    	for(var i = 0; i < tempApi.length; i++){
+	    		tempFilter = this.props.results.filter((api) => {
+	    			return api.api === tempApi[i];
+	    		})
+
+	    		finalFilter = finalFilter.concat(tempFilter);
+	    	}
+
+	    	console.log('final filter length in apiChoicesChange', finalFilter.length);
+
+			this.setState({ pageCount: Math.ceil(finalFilter.length/this.state.paginationIntervals) }, () => {
+				console.log("apiChoicesChange pageCount", this.state.pageCount);
+			});
     	});
     }
 
@@ -269,13 +295,13 @@ class CardsModal extends Component {
     	);
     }
 
-    sortChange(val){
+    sortChange(val) {
     	this.setState({ sortVal: val.value }, () => {
     		console.log("this is the new sort val", this.state.sortVal);
     	});
     }
 
-    sortResults(data){
+    sortResults(data) {
     	if(this.state.sortVal === 'low'){
     		var temp = data;
     		temp.sort(function(a, b) {
@@ -293,6 +319,28 @@ class CardsModal extends Component {
 
 			return temp;
     	}
+    }
+
+    filterApi(data) {
+    	var tempApi = this.state.apiToUse;
+    	tempApi = tempApi.split(',');
+
+    	console.log("this is tempapi in filterapi", tempApi);
+
+    	var tempFilter = [];
+    	var finalFilter = [];
+
+    	for(var i = 0; i < tempApi.length; i++){
+    		tempFilter = data.filter((api) => {
+    			return api.api === tempApi[i];
+    		})
+
+    		console.log("this is index tempApi", tempApi[i]);
+    		console.log("this is tempFilter tempApi", tempFilter);
+    		finalFilter = finalFilter.concat(tempFilter);
+    	}
+
+    	return finalFilter;
     }
 
     renderSort() {
