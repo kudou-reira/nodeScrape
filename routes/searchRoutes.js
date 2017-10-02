@@ -50,6 +50,8 @@ module.exports = (app) => {
 		// var gpParts = createGPLink(gpWardNames, gpRmCode, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance)
 		// console.log('this is createGPLink', gpParts);
 
+
+		//create gpLinks
 		var gpLinks = [];
 
 		for(var j = 0; j < ward.length; j++){
@@ -65,7 +67,7 @@ module.exports = (app) => {
 		console.log("this is apamanString", apamanString);
 
 
-
+		//create apamanLinks
 		var apamanParts = createApamanLink(apamanWardNames, apamanRmCode, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance)
 		console.log("this is createApamanLink", apamanParts);
 
@@ -82,6 +84,8 @@ module.exports = (app) => {
 
 		//main
 		//declare functions as variables to be passed into async parallel
+		//push them onto the stack
+		//rawData is for gp ONLY
 		let rawData = [];
 		var count = 0;
 		var gpLinksCount = gpLinks.length;
@@ -96,9 +100,8 @@ module.exports = (app) => {
 					console.log('processed ');
 					gpLinksCount--;
 					// console.log('count', gpLinksCount);
-					rawData.push(result);
+					rawData = rawData.concat(result);
 					// console.log("this is waterfall gaijinpot", rawData);
-					var temp = rawData;
 
 					// when count is 0, do the callback
 					if(gpLinksCount === 0) {
@@ -113,9 +116,8 @@ module.exports = (app) => {
 				console.log('all links processed :D');
 				console.log('all links processed :D');
 
-				var temp = _.flatten(result);
-				console.log('this is the result', temp);
-				callback(null, temp);
+				console.log('this is the result', result);
+				callback(null, result);
 			});
 		}
 
@@ -131,6 +133,7 @@ module.exports = (app) => {
 
 
 
+		//push functions needed onto stack
 		var apiStack = [];
 
 		var apiAssign = {
