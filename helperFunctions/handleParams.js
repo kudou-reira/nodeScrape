@@ -83,7 +83,6 @@ const createGPLink = (ward, roomType, lowPrice, highPrice, lowerRoom, higherRoom
 	var roomTypeFormat = '';
 
 
-
 	var roomType = roomType.sort(function(a, b){return a - b});
 
 	wardFormat = ward
@@ -170,8 +169,38 @@ const apamanRoomCode = (value) => {
 	return conversionToApamanCode(value);
 }
 
+const allGPLinks = (ward, gpRmCode, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance) => {
+	var gpLinks = [];
+	for(var j = 0; j < ward.length; j++){
+		var gpParts = createGPLink(ward[j], gpRmCode, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance)
+		var gpString = '';
+		for(var i = 0; i < gpParts.length; i++){
+			gpString += gpParts[i];
+		}
+		gpLinks.push(gpString);
+	}
+
+	return gpLinks;
+}
+
+const allApamanLinks = (apamanParts) => {
+	var apamanString = ''
+	for(var i = 0; i < apamanParts.length; i++){
+		apamanString += apamanParts[i];
+	}
+	return apamanString;
+}
+
+const countDecimals = (value) => {
+    if(Math.floor(value) === value) return 0;
+    return value.toString().split(".")[1].length || 0; 
+}
+
 module.exports = {
+	countDecimals,
 	createGPLink,
+	allGPLinks,
+	allApamanLinks,
 	gpRoomCode,
 	createApamanLink,
 	apamanCity,
