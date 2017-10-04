@@ -42,7 +42,7 @@ const getGPPageNumber = (link, ward, gpRmCode, lowPrice, highPrice, lowerRoom, h
 			//this is the problem here ward[0]
 			var gpParts = createGPLink(ward, gpRmCode, lowPrice, highPrice, lowerRoom, higherRoom, deposit, key, age, distance)
 
-			for(var i = 1; i <= 1; i++){
+			for(var i = 1; i <= numberPages; i++){
 				var j = 0;
 				while(j < gpParts.length){
 					if(j === 0){

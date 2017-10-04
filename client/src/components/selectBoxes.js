@@ -331,13 +331,13 @@ class SelectBoxes extends Component {
 			console.log("this is the length of placesToSearch", this.state.placesToSearch.length);
 			console.log("places to search error", this.state.placesToSearchError)
 			return(
-				<h2>Please select at least one ward</h2>
+				<h2 id="alert">Please select at least one ward</h2>
 			)
 		}
 
 		else if(this.state.sizeToSearch < 1){
 			return(
-				<h2>Please select at least one room type</h2>
+				<h2 id="alert">Please select at least one room type</h2>
 			)
 		}
 
@@ -522,7 +522,6 @@ class SelectBoxes extends Component {
 			    </div>
 			    <CardsModal results={this.props.results} options={this.state.options} filter={this.state.apiToUse} />
 			    {console.log('these are results', this.props.results)}
-
 		    </div>
 		);
 	}

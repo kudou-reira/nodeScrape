@@ -31,6 +31,10 @@ h3{
     text-align:center !important;
 }
 
+#alert{
+    color: red;
+}
+
 .well {
     background: #FFFFFF;
 }

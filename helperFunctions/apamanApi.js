@@ -9,12 +9,13 @@ const getApamanPageNumber = (apamanString, apamanParts, callback) => {
 			$ = cheerio.load(html);
 
 			var searchPageBottom = ($('.mod_pager'));
+			var numberPages;
 
 			searchPageBottom.each(function() {
 				numberPages = $(this).find('.next').prev().text();
 			});
 
-			var numberPages;
+			
 			console.log("this is number", numberPages);
 
 			//create page links
@@ -22,8 +23,7 @@ const getApamanPageNumber = (apamanString, apamanParts, callback) => {
 			var apamanLinks = [];
 
 			//create unique links
-
-			for(var i = 1; i <= 1; i++){
+			for(var i = 1; i <= numberPages; i++){
 				var j = 0;
 				while(j < apamanParts.length){
 

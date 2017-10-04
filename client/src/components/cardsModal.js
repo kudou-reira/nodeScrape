@@ -42,10 +42,11 @@ class CardsModal extends Component {
 
 	componentWillReceiveProps(nextProps){
 		if(nextProps.results !== this.props.results){
-
-			this.setState({ pageCount: Math.ceil(nextProps.results.length/this.state.paginationIntervals) }, () => {
-				console.log("pageCount in receive props", this.state.pageCount);
-			});
+			if(nextProps.results !== null) {
+				this.setState({ pageCount: Math.ceil(nextProps.results.length/this.state.paginationIntervals), differentValues: true }, () => {
+					console.log("pageCount in receive props", this.state.pageCount);
+				});
+			}
 		}
 
 		var tempFilter = nextProps.filter;
@@ -54,6 +55,8 @@ class CardsModal extends Component {
 	}
 
 	closeModal() {
+		this.props.nullValue(null);
+		this.setState({ pageCount: 0 });
     	this.props.modalLogic(false);
     }
 
@@ -415,8 +418,9 @@ class CardsModal extends Component {
 				          </Modal.Body>
 				        : <Modal.Body>
 				          	<div className="container">
+				          		<Modal.Title id="contained-modal-title-lg">If your parameters aren't narrow enough, the search may take a while! Thank you for your patience...</Modal.Title>
 					            <div>
-			            			<Loader color='#4DAF7C' size="40px" />
+			            			<Loader color='#4DAF7C' size="24px" />
 								</div>
 						    </div>
 				          </Modal.Body>
@@ -442,7 +446,6 @@ class CardsModal extends Component {
 			            </Modal.Footer>
 			            : null
 			        }
-		            
 		        </Modal>
 			</ButtonToolbar>
 		);
