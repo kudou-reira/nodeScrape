@@ -25,6 +25,12 @@ h3{
     text-align:left;
 }
 
+#header{
+    margin-top: 2%;
+    margin-bottom: 2%;
+    text-align:center !important;
+}
+
 .well {
     background: #FFFFFF;
 }

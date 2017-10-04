@@ -5,6 +5,8 @@ import FaHeart from 'react-icons/lib/fa/heart';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import ReactPaginate from 'react-paginate';
 import Select from 'react-select';
+import Loader from 'halogen/PulseLoader';
+
 import 'react-select/dist/react-select.css';
 
 import { connect } from 'react-redux';
@@ -217,10 +219,25 @@ class CardsModal extends Component {
     paginationChange(val){
     	this.setState({ paginationIntervals: val.value, paginationPlaceHolder: val.label }, () => {
     		console.log(this.state.paginationPlaceHolder);
-    		this.setState({ pageCount: Math.ceil(this.props.results.length/this.state.paginationIntervals) }, () => {
-				console.log("pageCount in receive props", this.state.pageCount);
+
+    		var tempApi = this.state.apiToUse;
+	    	tempApi = tempApi.split(',');
+
+	    	console.log("this is tempapi in apiChoicesChange", tempApi);
+
+	    	var tempFilter = [];
+	    	var finalFilter = [];
+
+	    	for(var i = 0; i < tempApi.length; i++){
+	    		tempFilter = this.props.results.filter((api) => {
+	    			return api.api === tempApi[i];
+	    		})
+	    		finalFilter = finalFilter.concat(tempFilter);
+	    	}
+
+			this.setState({ pageCount: Math.ceil(finalFilter.length/this.state.paginationIntervals) }, () => {
+				console.log('new pagination intervals', this.state.paginationIntervals);
 			});
-    		console.log('new pagination intervals', this.state.paginationIntervals);
     	})
     }
 
@@ -399,7 +416,7 @@ class CardsModal extends Component {
 				        : <Modal.Body>
 				          	<div className="container">
 					            <div>
-			            			Loading your results...
+			            			<Loader color='#4DAF7C' size="40px" />
 								</div>
 						    </div>
 				          </Modal.Body>

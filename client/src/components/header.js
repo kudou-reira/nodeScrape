@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import FaGoogle from 'react-icons/lib/fa/google';
+import FaFacebook from 'react-icons/lib/fa/facebook';
+import FaTwitter from 'react-icons/lib/fa/twitter';
 
 class Header extends Component {
 
@@ -12,9 +15,21 @@ class Header extends Component {
 			case false:
 				return(
 					<Nav pullRight>
-						<NavItem href="/auth/google">Login with Google</NavItem>
-				        <NavItem href="/auth/facebook">Login with Facebook</NavItem>
-				        <NavItem href="/auth/twitter">Login with Twitter</NavItem>
+						<NavItem href="/auth/google">
+							<div style={{color: 'white'}}>
+								<FaGoogle size={20} />
+							</div>
+						</NavItem>
+				        <NavItem href="/auth/facebook">
+				        	<div style={{color: 'white'}}>
+								<FaFacebook size={20} />
+							</div>
+				        </NavItem>
+				        <NavItem href="/auth/twitter">
+				        	<div style={{color: 'white'}}>
+								<FaTwitter size={20} />
+							</div>
+				        </NavItem>
 			        </Nav>
 				);
 			default:

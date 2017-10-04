@@ -8,8 +8,8 @@ class GoogleMap extends Component {
 		new google.maps.Map(this.refs.map, {
 			zoom: 12,
 			center: {
-				lat: 36,
-				lng: 138
+				lat: 35.6895,
+				lng: 139.6917
 			}
 		});
 	}
