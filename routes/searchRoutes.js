@@ -10,7 +10,7 @@ const { getApamanPageNumber, getApamanData } = require('../helperFunctions/apama
 
 module.exports = (app) => {
 
-	app.get('/api/searchByWard', (req, res) => {
+	app.get('/api/searchByWard', async (req, res) => {
 
 		let ward = req.query.ward;
 		let roomType = req.query.roomType;
@@ -100,7 +100,7 @@ module.exports = (app) => {
 
 		console.log("this is api stack", apiStack);
 
-		combineApi((err, result) => {
+		await combineApi((err, result) => {
 			var temp = _.flatten(result);
 			temp.sort(function(a, b) {
 		    	return a.averagePrice - b.averagePrice;
@@ -109,6 +109,8 @@ module.exports = (app) => {
 
 			res.send(temp);
 		});
+
+
 
 
 		function combineApi(callback) {
